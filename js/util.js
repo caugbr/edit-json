@@ -1,20 +1,20 @@
-function $single(selector, context) {
+export function $single(selector, context) {
     if (selector.tagName ?? false) {
         return selector;
     }
     return (context ? context : document).querySelector(selector);
 }
 
-function $list(selector, context) {
+export function $list(selector, context) {
     return (context ? context : document).querySelectorAll(selector);
 }
 
-function $last(selector, context) {
+export function $last(selector, context) {
     const list = $list(selector, context);
     return list[list.length - 1] ?? undefined;
 }
 
-function $apply(selector, fnc, context) {
+export function $apply(selector, fnc, context) {
     const elems = $list(selector, context);
     if (typeof fnc == 'function') {
         Array.from(elems).forEach(el => fnc.call(el, el));
@@ -22,7 +22,7 @@ function $apply(selector, fnc, context) {
     return elems;
 }
 
-function insertAfter(newNode, refNode) {
+export function insertAfter(newNode, refNode) {
     if (refNode.parentNode) {
         if (refNode.nextSibling) {
             refNode.parentNode.insertBefore(newNode, refNode.nextSibling);
@@ -32,7 +32,7 @@ function insertAfter(newNode, refNode) {
     }
 }
 
-function tag(tagName = 'div', attrs = {}, content = '') {
+export function tag(tagName = 'div', attrs = {}, content = '') {
     const elem = document.createElement(tagName);
     Object.entries(attrs).forEach(([key, value]) => elem.setAttribute(key, value));
 
@@ -54,28 +54,18 @@ function tag(tagName = 'div', attrs = {}, content = '') {
     return elem;
 }
 
-function isPlainObject(obj) {
+export function isPlainObject(obj) {
   if (typeof obj !== 'object' || obj === null) return false;
 
   const proto = Object.getPrototypeOf(obj);
   return proto === Object.prototype || proto === null;
 }
 
-
-// function rootEvent(selector, eventName, callback) {
-//     document.body.addEventListener(eventName, event => {
-//         if (event.target.matches(`${selector}, ${selector} *`)) {
-//             const elem = event.target.closest(selector);
-//             callback.call(elem, event);
-//         }
-//     })
-// }
-function rootEvent(selector, eventName, callback) {
+export function rootEvent(selector, eventName, callback) {
     document.body.addEventListener(eventName, async (event) => {
         if (event.target.matches(`${selector}, ${selector} *`)) {
             const elem = event.target.closest(selector);
-            console.log('NAME', callback.constructor.name)
-            const isAsync = callback.constructor.name === 'AsyncFunction';
+            const isAsync = callback.constructor.name === 'Asyncexport function';
             event.preventDefault();
             if (isAsync) {
                 await callback.call(elem, event);
@@ -84,4 +74,23 @@ function rootEvent(selector, eventName, callback) {
             }
         }
     });
+}
+
+
+
+/**
+ * Loads external CSS via <link>
+ * @param {string|string[]} cssPaths - Path to CSS file/files
+ * @returns {Promise<void[]>}
+ */
+export function loadCss(cssPaths) {
+    const files = Array.isArray(cssPaths) ? cssPaths : [cssPaths];
+    return Promise.all(files.map(path => new Promise((resolve, reject) => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = path;
+        link.onload = resolve;
+        link.onerror = () => reject(new Error(`Falha ao carregar CSS: ${path}`));
+        document.head.appendChild(link);
+    })));
 }

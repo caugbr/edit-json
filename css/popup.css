@@ -125,6 +125,12 @@
     cursor: pointer;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
+
+.popup-overlay .popup-popup .footer-buttons button.secondary {
+    background-color: #d9d9d9;
+    color: #333;
+    border: 1px solid #ccc;
+}
 /*
 .popup-overlay .popup-popup .footer-buttons button {
     margin-left: 10px;

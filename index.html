@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor JSON para Formulários</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" integrity="sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        *, ::after, ::before {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .example {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        .example h2 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .json-trigger {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .json-link {
+            color: #2196F3;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        textarea.json-data {
+            width: 100%;
+            min-height: 100px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .field-group {
+            margin-bottom: 15px;
+        }
+        .example label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="font-family: 'Consolas', 'Courier New', monospace; font-size: 42px;">EditJSON</h1>
+
+    <p>Um editor amigável para valores no formato JSON</p>
+    
+    <div class="example">
+        <h2>1. Textarea Clicável</h2>
+        <p>Clique diretamente no textarea para editar o JSON:</p>
+        
+        <div class="field-group">
+            <label for="example1">Configurações do Widget:</label>
+            <textarea 
+                id="example1" 
+                class="json-data" 
+                data-json-editor
+            >{"tamanho":"grande","cor":"vermelho"}</textarea>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>2. Textarea com Botão</h2>
+        <p>Clique no botão para abrir o editor:</p>
+        
+        <div class="field-group">
+            <label for="example2">Preferências do Usuário:</label>
+            <button class="json-trigger" data-json-editor data-target-selector="#example2">
+                Editar JSON
+            </button>
+            <textarea 
+                id="example2" 
+                class="json-data" 
+                readonly
+            >{"notificacoes":true,"tema":"escuro","idioma":"pt"}</textarea>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>3. Input Hidden com Link</h2>
+        <p>Clique no link para editar o JSON que será enviado com o formulário:</p>
+        
+        <form id="meuFormulario">
+            <div class="field-group">
+                <label>Configurações Avançadas:</label>
+                <a class="json-link" data-json-editor data-target-selector="#example3">
+                    Editar configurações avançadas
+                </a>
+                <input 
+                    type="hidden" 
+                    id="example3" 
+                    name="config_avancadas"
+                    value='{"modo":"experimental","nivel":5,"recursos":["a","b"]}'
+                >
+            </div>
+        </form>
+    </div>
+
+    <script type="module" src="js/apply-edit-json.js"></script>
+</body>
+</html>

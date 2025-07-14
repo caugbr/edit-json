@@ -1,26 +1,70 @@
+// import '../css/edit-json.css';
+import Popup from './popup.js';
+import { $single, $apply, tag, isPlainObject, rootEvent } from './util.js';
 
 /**
  * Classe para edição interativa de JSON em uma interface popup
+ * @author Cau Guanabara <cauguanabara@gmail.com>
  * @class
  */
-class EditJSON {
-    /** @type {string} Identificador único do editor */
+class EditJSON {    
+    /** @type {string} Unique editor identifier */
     id = '';
-    /** @type {string} Texto JSON original */
+
+    /** @type {string} Original JSON text */
     jsonText = '';
-    /** @type {Object|Array|null} Dados JSON parseados */
+
+    /** @type {Object|Array|null} Parsed JSON data */
     jsonData = null;
-    /** @type {HTMLElement|null} Elemento de texto contendo o JSON */
+
+    /** @type {HTMLElement|null} Text element containing JSON */
     jsonElement = null;
-    /** @type {HTMLElement|null} Elemento HTML do editor */
+
+    /** @type {HTMLElement|null} HTML editor element */
     htmlElement = null;
-    /** @type {Popup|null} Instância do popup */
+
+    /** @type {Popup|null} Popup instance */
     popup = null;
 
+    /** @type {string} CSS selector for trigger elements */
+    static selector = '[data-json-editor]';
+
+    /** @type {Object} Customizable strings and icons */
+    static strings = {
+        popupTitle: 'Edit JSON',
+        popupOkButtonLabel: 'Done',
+        popupCancelButtonLabel: 'Cancel',
+        targetElementNotFound: 'Target element not found.',
+        moveUpTitle: 'Move up',
+        moveUpIcon: '<i class="fas fa-arrow-circle-up"></i>',
+        moveDownTitle: 'Move down',
+        moveDownIcon: '<i class="fas fa-arrow-circle-down"></i>',
+        removeTitle: 'Remove this item',
+        removeIcon: '<i class="fas fa-times-circle"></i>',
+        collapseItemTitle: 'Collapse item',
+        collapseItemIcon: '<i class="fas fa-chevron-circle-down"></i>',
+        expandItemTitle: 'Expand item',
+        expandItemIcon: '<i class="fas fa-chevron-circle-up"></i>',
+        noKeyError: 'The key is required.',
+        selectType: 'Select type',
+        add: 'Add',
+        newKey: 'New key',
+        confirmRemoval: 'Remove this item?',
+        elementNotFound: 'Target element not found',
+        invalidJson: 'Invalid JSON',
+        jsonNotSet: 'JSON is not set',
+        unnamed: 'Unnamed'
+    };
+
+    /** @type {Boolean} Can user move object / array items? */
+    static canMoveItems = true;
+    /** @type {Boolean} Can user remove object / array items? */
+    static canRemoveItems = true;
+
     /**
-     * Cria uma instância do editor JSON
+     * Creates a JSON editor instance
      * @constructor
-     * @param {HTMLElement|null} jsonElement - Elemento de entrada/saída do JSON
+     * @param {HTMLElement|null} jsonElement - JSON input/output element
      */
     constructor(jsonElement = null) {
         if (jsonElement) {
@@ -43,45 +87,26 @@ class EditJSON {
         }
     }
 
-    moveItem(elem, direction) {
-        const line = elem.closest('.edit-array .input-wrapper, .edit-object .edit-line');
-        if (!line) return;
-
-        const isArray = line.classList.contains('input-wrapper');
-        const container = isArray ? line.closest('.edit-array') : line.closest('.edit-object');
-        if (!container) return;
-
-        const selector = isArray ? '.input-wrapper' : '.edit-line';
-        const allItems = Array.from(container.children).filter(c => c.matches(selector));
-        const currentIndex = allItems.indexOf(line);
-
-        if (direction === 'up' && currentIndex > 0) {
-            container.insertBefore(line, allItems[currentIndex - 1]);
-        } else if (direction === 'down' && currentIndex < allItems.length - 1) {
-            container.insertBefore(allItems[currentIndex + 1], line);
-        }
-    }
-
-    upItem(elem) {
-        this.moveItem(elem, 'up');
-    }
-
-    downItem(elem) {
-        this.moveItem(elem, 'down');
+    /**
+     * Updates the strings configuration
+     * @static
+     * @param {Object} obj - New strings configuration
+     */
+    static setStrings(obj) {
+        this.strings = { ...this.strings, ...obj };
     }
 
     /**
-     * Aplica o editor a todos os elementos correspondentes ao seletor
+     * Applies editor to all elements matching the selector
      * @static
-     * @param {string} [selector='[data-json-editor]'] - Seletor CSS dos elementos ativadores
      */
-    static apply(selector = '[data-json-editor]') {
-        $apply(selector, el => {
+    static apply() {
+        $apply(this.selector, el => {
             const targetSelector = el.dataset.targetSelector;
             const jsonEl = targetSelector ? document.querySelector(targetSelector) : el;
 
             if (!jsonEl) {
-                console.warn(`Elemento alvo #${targetSelector} não encontrado.`);
+                console.warn(this.strings.elementNotFound);
                 return;
             }
 
@@ -97,13 +122,13 @@ class EditJSON {
     }
 
     /**
-     * Configura o elemento JSON a ser editado
-     * @param {HTMLElement} jsonElement - Elemento contendo o JSON
-     * @returns {boolean} True se o JSON foi parseado com sucesso
+     * Sets the JSON element to be edited
+     * @param {HTMLElement} jsonElement - Element containing JSON
+     * @returns {boolean} True if JSON was parsed successfully
      */
     set(jsonElement) {
         this.jsonElement = jsonElement;
-        this.id = jsonElement.id || jsonElement.name || 'unnamed';
+        this.id = jsonElement.id || jsonElement.name || EditJSON.strings.unnamed;
         this.jsonText = jsonElement.value.trim();
 
         try {
@@ -115,35 +140,38 @@ class EditJSON {
             this.jsonElement = null;
             this.jsonText = '';
             this.id = '';
-            console.error('JSON inválido:', e);
+            console.error(EditJSON.strings.invalidJson, e);
             return false;
         }
     }
 
     /**
-     * Cria o elemento HTML do editor
+     * Creates the HTML editor element
      */
     makeHtml() {
         const existent = document.getElementById(`__ej_${this.id}`);
         if (existent) {
             this.htmlElement = existent;
-            return;
+        } else {
+            const cls = 'edit-json' 
+                + (EditJSON.canMoveItems ? '' : ' no-move') 
+                + (EditJSON.canRemoveItems ? '' : ' no-remove');
+            this.htmlElement = tag('div', {
+                id: `__ej_${this.id}`,
+                class: cls,
+                style: 'display: none;'
+            });
+            document.body.appendChild(this.htmlElement);
         }
-        this.htmlElement = tag('div', {
-            id: `__ej_${this.id}`,
-            class: 'edit-json',
-            style: 'display: none;'
-        });
-        document.body.appendChild(this.htmlElement);
     }
 
     /**
-     * Inicia a edição do JSON
-     * @returns {boolean} False se não houver dados para editar
+     * Starts JSON editing
+     * @returns {boolean} False if no data to edit
      */
     edit() {
         if (!this.jsonData) {
-            console.error('JSON is not set.');
+            console.error(EditJSON.strings.jsonNotSet);
             return false;
         }
 
@@ -158,32 +186,44 @@ class EditJSON {
     }
 
     /**
-     * Abre o editor em um popup
+     * Opens the editor in a popup
      */
     openEditor() {
         if (this.htmlElement.innerHTML.trim() === '') {
             this.edit();
         }
-        this.popup = new Popup('Edit JSON', this.htmlElement);
+        this.popup = new Popup(EditJSON.strings.popupTitle, this.htmlElement);
         this.htmlElement.style.display = 'block';
-        const okButton = tag('button', { type: 'button', class: 'save-json' }, 'Save');
+        const cancelButton = tag('button', { type: 'button', class: 'close-popup secondary' }, EditJSON.strings.popupCancelButtonLabel);
+        const okButton = tag('button', { type: 'button', class: 'save-json' }, EditJSON.strings.popupOkButtonLabel);
+        cancelButton.addEventListener('click', () => this.popup.close());
         okButton.addEventListener('click', () => {
             const json = this.extractFromHtml();
             this.jsonElement.value = JSON.stringify(json, null, 4);
             this.popup.close();
         });
+        this.popup.addFooterButton(cancelButton);
         this.popup.addFooterButton(okButton);
         this.popup.open();
     }
 
     /**
-     * Cria um campo editável para um par chave-valor
-     * @param {string} key - Nome da propriedade
-     * @param {*} val - Valor da propriedade
-     * @returns {HTMLElement} Elemento DIV contendo o campo editável
+     * Creates an editable field for key-value pair
+     * @param {string} key - Property name
+     * @param {*} val - Property value
+     * @returns {HTMLElement} DIV element containing the editable field
      */
     editField(key, val) {
         const keyText = tag('span', { contenteditable: true, spellcheck: false, class: 'edit-key' }, key);
+        const cb = () => {
+            if (!this.isValidKey(keyText.innerText.trim()) || this.isDuplicatedKey(keyText)) {
+                keyText.classList.add('invalid');
+            } else {
+                keyText.classList.remove('invalid');
+            }
+        };
+        keyText.addEventListener('input', cb);
+        keyText.addEventListener('input', cb);
         let valText;
         switch (this.getType(val)) {
             case 'array':
@@ -199,9 +239,21 @@ class EditJSON {
     }
 
     /**
-     * Cria o HTML apropriado para o valor com base em seu tipo
-     * @param {*} val - Valor a ser renderizado
-     * @returns {HTMLElement} Elemento contendo o controle de edição
+     * Returs all keys of the given object, as an array of strings
+     * @param {HTMLElement} elem - Element inside the object (or the object itself)
+     * @returns {string[]} Array with all object keys
+     */
+    objectKeys(elem) {
+        const obj = elem.closest('.edit-object');
+        const keyEls = obj.querySelectorAll(':scope > .edit-line > .edit-key');
+        return Array.from(keyEls).map(e => e.innerText.trim());
+    }
+
+    /**
+     * Creates appropriate HTML for value based on its type
+     * @param {*} val - Value to render
+     * @param {boolean} [actions=true] - Whether to include action buttons
+     * @returns {HTMLElement} Element containing the edit control
      */
     valHtml(val, actions = true) {
         let valText;
@@ -251,17 +303,33 @@ class EditJSON {
         return tag('span', { class: 'input-wrapper' }, valText);
     }
 
+    /**
+     * Creates action buttons (remove, move up/down)
+     * @returns {HTMLElement} Action buttons container
+     */
     makeActions() {
-        const removeButton = tag('a', { href: '#', class: 'remove-item skip' }, '&times;');
-        const upButton = tag('a', { href: '#', class: 'up-item skip' }, '<i class="fas fa-caret-up"></i>');
-        const downButton = tag('a', { href: '#', class: 'down-item skip' }, '<i class="fas fa-caret-down"></i>');
+        const removeButton = tag(
+            'a', 
+            { href: '#', title: EditJSON.strings.removeTitle, class: 'remove-item skip' }, 
+            EditJSON.strings.removeIcon
+        );
+        const upButton = tag(
+            'a', 
+            { href: '#', class: 'up-item skip', title: EditJSON.strings.moveUpTitle }, 
+            EditJSON.strings.moveUpIcon
+        );
+        const downButton = tag(
+            'a', 
+            { href: '#', class: 'down-item skip', title: EditJSON.strings.moveDownTitle }, 
+            EditJSON.strings.moveDownIcon
+        );
         return tag('div', { class: 'actions skip' }, [removeButton, upButton, downButton]);
     }
 
     /**
-     * Cria interface para edição de array
-     * @param {Array} arr - Array a ser editado
-     * @returns {HTMLElement} Elemento SPAN contendo os itens do array
+     * Creates interface for array editing
+     * @param {Array} arr - Array to edit
+     * @returns {HTMLElement} SPAN element containing array items
      */
     editArray(arr) {
         const items = [];
@@ -275,12 +343,12 @@ class EditJSON {
     }
 
     /**
-     * Cria interface para adição de novo item em array
-     * @returns {HTMLElement} Elemento DIV com controles de adição
+     * Creates interface for adding new array item
+     * @returns {HTMLElement} DIV with add controls
      */
     newArrayItem() {
         const valField = tag('select', { class: 'value' }, [
-            tag('option', { value: '', selected: true, disabled: true }, 'Select type'),
+            tag('option', { value: '', selected: true, disabled: true }, EditJSON.strings.selectType),
             tag('option', { value: 'string' }, 'string'),
             tag('option', { value: 'number' }, 'number'),
             tag('option', { value: 'boolean' }, 'boolean'),
@@ -290,7 +358,7 @@ class EditJSON {
         valField.addEventListener('input', event => {
             this.enableAddButton(event.target);
         });
-        const addButton = tag('button', { type: 'button', disabled: true }, 'Add');
+        const addButton = tag('button', { type: 'button', disabled: true }, EditJSON.strings.add);
         addButton.addEventListener('click', event => {
             this.addItem(event.target);
         });
@@ -298,9 +366,9 @@ class EditJSON {
     }
 
     /**
-     * Cria interface para edição de objeto
-     * @param {Object} obj - Objeto a ser editado
-     * @returns {HTMLElement} Elemento SPAN contendo os campos do objeto
+     * Creates interface for object editing
+     * @param {Object} obj - Object to edit
+     * @returns {HTMLElement} SPAN element containing object fields
      */
     editObject(obj) {
         const lines = [];
@@ -314,15 +382,15 @@ class EditJSON {
     }
 
     /**
-     * Cria interface para adição de nova propriedade em objeto
-     * @returns {HTMLElement} Elemento DIV com controles de adição
+     * Creates interface for adding new object property
+     * @returns {HTMLElement} DIV with add controls
      */
     newObjectItem() {
-        const keyField = tag('input', { type: 'text', class: 'key', placeholder: 'New key' });
+        const keyField = tag('input', { type: 'text', class: 'key', placeholder: EditJSON.strings.newKey });
         keyField.addEventListener('input', event => this.enableAddButton(event.target));
         const keyEl = tag('span', {}, ['"', keyField, '": ']);
         const valField = tag('select', { class: 'value' }, [
-            tag('option', { value: '', selected: true, disabled: true }, 'Select type'),
+            tag('option', { value: '', selected: true, disabled: true }, EditJSON.strings.selectType),
             tag('option', { value: 'string' }, 'string'),
             tag('option', { value: 'number' }, 'number'),
             tag('option', { value: 'boolean' }, 'boolean'),
@@ -330,16 +398,28 @@ class EditJSON {
             tag('option', { value: 'object' }, 'object')
         ]);
         valField.addEventListener('input', event => this.enableAddButton(event.target));
-        const addButton = tag('button', { type: 'button', disabled: true }, 'Add');
+        const addButton = tag('button', { type: 'button', disabled: true }, EditJSON.strings.add);
         addButton.addEventListener('click', event => {
             this.addItem(event.target);
         });
         return tag('div', { class: 'add-obj-item skip' }, [ keyEl, valField, addButton ]);
     }
 
+    /**
+     * Creates toggle links (collapse/expand)
+     * @returns {HTMLElement[]} Array of toggle elements
+     */
     toggleLinks() {
-        const toggleUp = tag('a', { class: 'toggle up skip', href: '#' }, '<i class="fas fa-chevron-up"></i>');
-        const toggleDown = tag('a', { class: 'toggle down skip', href: '#' }, '<i class="fas fa-chevron-down"></i>');
+        const toggleUp = tag(
+            'a', 
+            { class: 'toggle up skip', title: EditJSON.strings.collapseItemTitle, href: '#' }, 
+            EditJSON.strings.collapseItemIcon
+        );
+        const toggleDown = tag(
+            'a', 
+            { class: 'toggle down skip', title: EditJSON.strings.expandItemTitle, href: '#' }, 
+            EditJSON.strings.expandItemIcon
+        );
         toggleUp.addEventListener('click', event => {
             event.preventDefault();
             this.toggleUp(event.target);
@@ -351,19 +431,86 @@ class EditJSON {
         return [toggleUp, toggleDown];
     }
 
+    /**
+     * Collapses an item
+     * @param {HTMLElement} elem - Toggle element that triggered the action
+     */
     toggleUp(elem) {
         const wrapper = elem.closest('.edit-object-wrapper,.edit-array-wrapper');
         wrapper.classList.add('collapsed');
     }
 
+    /**
+     * Expands an item
+     * @param {HTMLElement} elem - Toggle element that triggered the action
+     */
     toggleDown(elem) {
         const wrapper = elem.closest('.edit-object-wrapper,.edit-array-wrapper');
         wrapper.classList.remove('collapsed');
     }
 
     /**
-     * Habilita/desabilita botão de adição com base na validade dos inputs
-     * @param {HTMLElement} elem - Elemento que disparou o evento
+     * Moves an item up or down
+     * @param {HTMLElement} elem - Element to move
+     * @param {string} direction - 'up' or 'down'
+     */
+    moveItem(elem, direction) {
+        const line = elem.closest('.edit-array .input-wrapper, .edit-object .edit-line');
+        if (!line) return;
+
+        const isArray = line.classList.contains('input-wrapper');
+        const container = isArray ? line.closest('.edit-array') : line.closest('.edit-object');
+        if (!container) return;
+
+        const selector = isArray ? '.input-wrapper' : '.edit-line';
+        const allItems = Array.from(container.children).filter(c => c.matches(selector));
+        const currentIndex = allItems.indexOf(line);
+
+        if (direction === 'up' && currentIndex > 0) {
+            container.insertBefore(line, allItems[currentIndex - 1]);
+        } else if (direction === 'down' && currentIndex < allItems.length - 1) {
+            container.insertBefore(allItems[currentIndex + 1], line);
+        }
+    }
+
+    /**
+     * Moves item up
+     * @param {HTMLElement} elem - Element to move
+     */
+    upItem(elem) {
+        this.moveItem(elem, 'up');
+    }
+
+    /**
+     * Moves item down
+     * @param {HTMLElement} elem - Element to move
+     */
+    downItem(elem) {
+        this.moveItem(elem, 'down');
+    }
+
+    isDuplicatedKey(key) {
+        const wrapper = key.closest('.edit-object');
+        const keys = wrapper.querySelectorAll('.edit-key');
+        const filtered = Array.from(keys).filter(e => e.innerText.trim() === key.innerText.trim());
+        return filtered.length > 1;
+    }
+
+    /**
+     * Valida chaves de objetos JSON
+     * @param {string} key - Chave a ser validada
+     * @returns {boolean}
+     */
+    isValidKey(key) {
+        return typeof key === 'string' && 
+            key.length > 0 &&
+            !/[\u0000-\u001F"\\]/.test(key) &&
+            !['__proto__', 'constructor'].includes(key);
+    }
+
+    /**
+     * Enables/disables add button based on input validity
+     * @param {HTMLElement} elem - Element that triggered the event
      */
     enableAddButton(elem) {
         const div = elem.closest('div');
@@ -377,8 +524,8 @@ class EditJSON {
     }
 
     /**
-     * Adiciona novo item ao array/objeto
-     * @param {HTMLElement} elem - Botão que disparou a ação
+     * Adds new item to array/object
+     * @param {HTMLElement} elem - Button that triggered the action
      */
     addItem(elem) {
         const iniVals = {
@@ -396,8 +543,12 @@ class EditJSON {
         if (input) {
             if (input.value) {
                 item = this.editField(input.value, iniVals[type]);
+                const keys = this.objectKeys(div);
+                if (keys.includes(input.value)) {
+                    item.querySelector('.edit-key').classList.add('invalid');
+                }
             } else {
-                console.error('The key is required.');
+                console.error(EditJSON.strings.noKeyError);
                 return;
             }
             input.value = '';
@@ -410,19 +561,23 @@ class EditJSON {
     }
 
     /**
-     * Remove um item do array/objeto com confirmação
-     * @param {HTMLElement} elem - Elemento a ser removido
+     * Removes item from array/object with confirmation
+     * @param {HTMLElement} elem - Element to remove
      * @returns {Promise<void>}
      */
     async removeItem(elem) {
         const confirmed = await new Promise(resolve =>
-            setTimeout(() => resolve(confirm('Deseja remover?')), 0)
+            setTimeout(() => resolve(confirm(EditJSON.strings.confirmRemoval)), 0)
         );
         if (confirmed) {
             elem.closest('.edit-object > .edit-line, .edit-array > .input-wrapper')?.remove();
         }
     }
 
+    /**
+     * Extracts JSON data from HTML editor
+     * @returns {Object|Array} Parsed JSON structure
+     */
     extractFromHtml() {
         const root = $single('.popup-popup .edit-json > :first-child');
         function parseNode(node) {
@@ -491,9 +646,9 @@ class EditJSON {
     }
 
     /**
-     * Determina o tipo de uma variável (melhorado para objetos/arrays)
-     * @param {*} variable - Valor a ser verificado
-     * @returns {string} Tipo do valor ('object', 'array', 'null', etc.)
+     * Determines variable type (improved for objects/arrays)
+     * @param {*} variable - Value to check
+     * @returns {string} Value type ('object', 'array', 'null', etc.)
      */
     getType(variable) {
         if (variable === null) {
@@ -509,9 +664,9 @@ class EditJSON {
     }
 
     /**
-     * Verifica se uma string representa uma data/hora
-     * @param {string} val - Valor a ser testado
-     * @returns {string|false} Tipo de data ('date', 'datetime-local', 'time') ou false
+     * Checks if string represents a date/time
+     * @param {string} val - Value to test
+     * @returns {string|false} Date type ('date', 'datetime-local', 'time') or false
      */
     isDateTime(val) {
         if (typeof val === 'string') {
@@ -528,3 +683,5 @@ class EditJSON {
         return false;
     }
 }
+
+export default EditJSON;

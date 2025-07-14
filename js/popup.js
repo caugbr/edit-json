@@ -1,3 +1,6 @@
+// import '../css/popup.css';
+import { $single, tag } from './util.js';
+
 /**
  * Classe Popup
  *
@@ -265,3 +268,5 @@ class Popup {
         }
     }
 }
+
+export default Popup;
