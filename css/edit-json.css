@@ -1,0 +1,230 @@
+
+textarea[data-json-editor] {
+    cursor: pointer;
+}
+
+.edit-json .edit-line,
+.edit-json .edit-array > .input-wrapper {
+    margin-left: 2rem;
+    line-height: 1.8;
+}
+
+.edit-json .add-obj-item {
+    margin-left: 2rem;
+    line-height: 1.8;
+
+}
+
+.edit-json .edit-value,
+.edit-json .edit-key,
+.edit-json input.edit-value-number-input {
+    padding: 2px 4px;
+    border-radius: 4px;
+    height: 26px;
+}
+
+.edit-json .edit-value:hover,
+.edit-json .edit-key:hover,
+.edit-json .add-obj-item input:hover,
+.edit-json .add-obj-item select:hover,
+.edit-json input.edit-value-number-input:hover,
+.edit-json .add-obj-item input:hover,
+.edit-json .add-obj-item select:hover {
+    background-color: #e9e9e9;
+}
+
+.edit-json .edit-value:focus,
+.edit-json .edit-key:focus,
+.edit-json .add-obj-item input:focus,
+.edit-json .add-obj-item select:focus,
+.edit-json input.edit-value-number-input:focus,
+.edit-json .add-obj-item input:focus,
+.edit-json .add-obj-item select:focus {
+    background-color: #e9e9e9;
+    outline: 1px solid #cccccc;
+}
+
+.edit-json .edit-value::before,
+.edit-json .edit-key::before,
+.edit-json .edit-value::after,
+.edit-json .edit-key::after {
+    content: '"';
+}
+
+.edit-json .edit-object,
+.edit-json .edit-array {
+    position: relative;
+}
+
+.edit-json .edit-object a.toggle,
+.edit-json .edit-array a.toggle {
+    margin: auto 0.35rem;
+}
+
+.edit-json .edit-object-wrapper a.toggle.down,
+.edit-json .edit-array-wrapper a.toggle.down {
+    display: none;
+}
+
+.edit-json .edit-object-wrapper.collapsed a.toggle.down,
+.edit-json .edit-array-wrapper.collapsed a.toggle.down {
+    display: inline;
+}
+
+.edit-json .edit-object-wrapper.collapsed a.toggle.up,
+.edit-json .edit-array-wrapper.collapsed a.toggle.up {
+    display: none;
+}
+
+.edit-json .edit-object-wrapper.collapsed .edit-object > *,
+.edit-json .edit-array-wrapper.collapsed .edit-array > * {
+    display: none;
+}
+
+.edit-json .edit-object::before {
+    content: '{';
+    font-weight: bold;
+}
+
+.edit-json .edit-object::after {
+    content: '}';
+    font-weight: bold;
+}
+
+.edit-json .edit-array > span,
+.edit-json .edit-array > select,
+.edit-json .edit-array > input {
+    display: block;
+    margin-left: 2rem;
+    min-width: 20px;
+}
+
+.edit-json .edit-array::before {
+    content: '[';
+    font-weight: bold;
+}
+
+.edit-json .edit-array::after {
+    content: ']';
+    font-weight: bold;
+}
+
+.edit-json .actions {
+    opacity: 0;
+    transition: opacity 200ms ease;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.edit-json .actions a {
+    font-size: 1.1em;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.edit-json a.remove-item {
+    color: brown;
+    font-size: 1.6em;
+}
+
+.edit-array > .actions,
+.edit-object > .actions {
+    position: absolute;
+    top: 0px;
+    left: 5px;
+}
+
+.edit-array:hover > .actions,
+.edit-array > .input-wrapper:hover > .actions,
+.edit-array > .input-wrapper:has(:focus) > .actions,
+.edit-object:hover > .actions,
+.edit-object > .edit-line:has(:focus) > .input-wrapper > .actions,
+.edit-object > .edit-line:hover > .input-wrapper > .actions {
+    opacity: 1;
+}
+
+.edit-json > .edit-array-wrapper:first-child > .edit-array > .actions,
+.edit-json > .edit-object-wrapper:first-child > .edit-object > .actions,
+.edit-json > .edit-array-wrapper:first-child > a.skip,
+.edit-json > .edit-object-wrapper:first-child > a.skip {
+    display: none;
+}
+
+.edit-value-date .edit-value-date-input {
+    opacity: 0;
+    position: absolute;
+    clip-path: inset(0 100% 0 0);
+    margin-left: 1rem;
+    line-height: 1.2rem;
+}
+
+.edit-value-date .edit-value-date-input:focus,
+.edit-value-date .edit-value-date-input:active,
+.edit-value-date.focused .edit-value-date-input {
+    opacity: 1;
+    position: static;
+    clip-path: none;
+}
+
+.edit-json .add-obj-item {
+    display: flex;
+    flex-direction: row;
+    gap: 0.6rem;
+    opacity: 0.3;
+    transition: opacity 200ms ease-in-out 0s;
+}
+
+.edit-json .add-obj-item:hover,
+.edit-json .add-obj-item:has(*:focus) {
+    opacity: 1;
+}
+
+.edit-json .add-obj-item * {
+    line-height: 1.2rem;
+    border: 0;
+    padding: 2px 4px;
+    border-radius: 4px;
+    min-width: 26px;
+}
+
+.edit-json .add-obj-item input[type="text"] {
+    max-width: 4em;
+    text-align: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+input.edit-value-number-input,
+select.edit-value {
+    line-height: 1.2rem;
+    border: 0;
+    max-width: 4em;
+}
+
+
+.popup-overlay .popup-popup {
+    display: flex;
+    flex-direction: column;
+}
+.popup-overlay .popup-popup article {
+    overflow: auto;
+    flex-grow: 6;
+    flex-shrink: 6;
+}
+.popup-overlay .popup-popup header {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.popup-overlay .popup-popup footer {
+    margin: 10px 16px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.popup-overlay .popup-popup .footer-buttons button {
+    padding: 0.2rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #4C6699;
+}
