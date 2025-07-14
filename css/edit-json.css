@@ -81,8 +81,8 @@ textarea[data-json-editor] {
     display: none;
 }
 
-.edit-json .edit-object-wrapper.collapsed .edit-object > *,
-.edit-json .edit-array-wrapper.collapsed .edit-array > * {
+.edit-json .edit-object-wrapper.collapsed .edit-object > *:not(.actions),
+.edit-json .edit-array-wrapper.collapsed .edit-array > *:not(.actions) {
     display: none;
 }
 
@@ -219,8 +219,37 @@ input.edit-value-number-input,
 select.edit-value {
     line-height: 1.2rem;
     border: 0;
-    max-width: 4em;
+    max-width: 4.25em;
 }
+
+
+
+select.edit-value {
+  width: 200px;
+  padding: 0 16px;
+  border-radius: 4px;
+  background-color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+select.edit-value::-ms-expand {
+  display: none;
+}
+select.edit-value {
+  background-image: none;
+}
+select.edit-value:hover,
+select.edit-value:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 16px;
+}
+
+
 
 
 .popup-overlay .popup-popup {

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor JSON para Formulários</title>
+    <title>JSON Editor for Forms</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" integrity="sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         *, ::after, ::before {
@@ -60,59 +60,63 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
+        .ej {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 42px;
+        }
     </style>
 </head>
 <body>
-    <h1 style="font-family: 'Consolas', 'Courier New', monospace; font-size: 42px;">EditJSON</h1>
+    <h1 class="ej">EditJSON</h1>
 
-    <p>Um editor amigável para valores no formato JSON</p>
+    <p>A user-friendly editor for JSON values in forms</p>
     
     <div class="example">
-        <h2>1. Textarea Clicável</h2>
-        <p>Clique diretamente no textarea para editar o JSON:</p>
+        <h2>Clickable Textarea</h2>
+        <p>Click directly on the text field to edit the JSON</p>
         
         <div class="field-group">
-            <label for="example1">Configurações do Widget:</label>
+            <label for="example1">Widget Settings:</label>
             <textarea 
                 id="example1" 
                 class="json-data" 
                 data-json-editor
-            >{"tamanho":"grande","cor":"vermelho"}</textarea>
+            >{"size":"large","color":"red"}</textarea>
         </div>
     </div>
     
     <div class="example">
-        <h2>2. Textarea com Botão</h2>
-        <p>Clique no botão para abrir o editor:</p>
+        <h2>Textarea with Button</h2>
+        <p>Click the button to open the editor</p>
         
         <div class="field-group">
-            <label for="example2">Preferências do Usuário:</label>
+            <label for="example2">User Preferences:</label>
             <button class="json-trigger" data-json-editor data-target-selector="#example2">
-                Editar JSON
+                Edit JSON
             </button>
             <textarea 
                 id="example2" 
                 class="json-data" 
                 readonly
-            >{"notificacoes":true,"tema":"escuro","idioma":"pt"}</textarea>
+            >{"notifications":true,"theme":"dark","language":"en"}</textarea>
         </div>
     </div>
     
     <div class="example">
-        <h2>3. Input Hidden com Link</h2>
-        <p>Clique no link para editar o JSON que será enviado com o formulário:</p>
+        <h2>Hidden Input with Link</h2>
+        <p>Click the link to edit the JSON that will be submitted with the form</p>
         
-        <form id="meuFormulario">
+        <form id="myForm">
             <div class="field-group">
-                <label>Configurações Avançadas:</label>
+                <label>Advanced Settings:</label>
                 <a class="json-link" data-json-editor data-target-selector="#example3">
-                    Editar configurações avançadas
+                    Edit advanced settings
                 </a>
                 <input 
                     type="hidden" 
                     id="example3" 
-                    name="config_avancadas"
-                    value='{"modo":"experimental","nivel":5,"recursos":["a","b"]}'
+                    name="advanced_settings"
+                    value='{"mode":"experimental","level":5,"features":["a","b"]}'
                 >
             </div>
         </form>
