@@ -4,12 +4,11 @@
 
 ## Highlights
 
--   Edits both objects and arrays
--   Add, remove, and reorder items
--   Smart input types (boolean, date, number, etc.)
--   Collapsible nested objects
--   Simple setup, no dependencies
-    
+-   **Dynamic item manipulation**: Add, remove, and reorder items
+-   **Type-Smart Inputs**: Automatic input selection for each data type (boolean, number, string)
+-   **Date/Time Helpers**: Built-in  `date`/`time`/`datetime-local`  inputs for temporal values
+-   **Color Picker**: Integrated  `color`  input for hex values
+-   **Zero Dependencies**: Lightweight vanilla JS implementation
 
 ## Usage
 

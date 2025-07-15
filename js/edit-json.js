@@ -299,14 +299,13 @@ class EditJSON {
     bidirectionalInput(type, value) {
         const txt = tag('span', { contenteditable: true, class: 'edit-value' }, value);
         const inp = tag('input', { type, value, class: `edit-value-${type}-input` });
-        const line = tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
         txt.addEventListener('focus', () => line.classList.add('focused'));
         txt.addEventListener('blur', () => line.classList.remove('focused'));
         txt.addEventListener('input', () => inp.value = txt.innerText.trim());
         inp.addEventListener('focus', () => line.classList.add('focused'));
         inp.addEventListener('blur', () => line.classList.remove('focused'));
         inp.addEventListener('input', () => txt.innerText = inp.value.trim());
-        return line;
+        return tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
     }
 
     /**

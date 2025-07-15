@@ -266,6 +266,7 @@ textarea[data-json-editor] {
 .popup-overlay .popup-popup {
     display: flex;
     flex-direction: column;
+    border: 1px solid #4C6699;
 }
 .popup-overlay .popup-popup header h2 {
     font-size: 20px;
