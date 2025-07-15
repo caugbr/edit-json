@@ -97,6 +97,14 @@ No need for Font Awesome unless you want to use it. All visual elements (includi
 
 ![The editor](./screenshots/json-editor.png)
 
+![Item action links](./screenshots/json-editor-actions.png)
+
+![Editing a boolean value](./screenshots/json-editorboolean.png)
+
+![Editing a string in date format](./screenshots/json-editor-date.png)
+
+![Duplicated object key](./screenshots/json-editor-invalid.png)
+
 ## License
 
 MIT — © Cau Guanabara
