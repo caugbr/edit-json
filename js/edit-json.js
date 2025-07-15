@@ -283,28 +283,8 @@ class EditJSON {
             default:
                 const dateType = this.isDateTime(val);
                 if (dateType) {
-                    // const txt = tag('span', { contenteditable: true, class: 'edit-value' }, val);
-                    // const inp = tag('input', { type: dateType, value: val, class: 'edit-value-date-input' });
-                    // const line = tag('span', { class: 'edit-value-date' }, [ txt, inp ]);
-                    // txt.addEventListener('focus', () => line.classList.add('focused'));
-                    // txt.addEventListener('blur', () => line.classList.remove('focused'));
-                    // txt.addEventListener('input', () => inp.value = txt.innerText);
-                    // inp.addEventListener('focus', () => line.classList.add('focused'));
-                    // inp.addEventListener('blur', () => line.classList.remove('focused'));
-                    // inp.addEventListener('input', () => txt.innerText = inp.value);
-                    // valText = line;
                     valText = this.bidirectionalInput(dateType, val);
                 } else if(this.isColor(val)) {
-                    // const txt = tag('span', { contenteditable: true, class: 'edit-value' }, val);
-                    // const inp = tag('input', { type: 'color', value: val, class: 'edit-value-color-input' });
-                    // const line = tag('span', { class: 'edit-value-date' }, [ txt, inp ]);
-                    // txt.addEventListener('focus', () => line.classList.add('focused'));
-                    // txt.addEventListener('blur', () => line.classList.remove('focused'));
-                    // txt.addEventListener('input', () => inp.value = txt.innerText);
-                    // inp.addEventListener('focus', () => line.classList.add('focused'));
-                    // inp.addEventListener('blur', () => line.classList.remove('focused'));
-                    // inp.addEventListener('input', () => txt.innerText = inp.value);
-                    // valText = line;
                     valText = this.bidirectionalInput('color', val);
                 } else {
                     valText = tag('span', { contenteditable: true, class: 'edit-value' }, val);
@@ -316,16 +296,16 @@ class EditJSON {
         return tag('span', { class: 'input-wrapper' }, valText);
     }
 
-    bidirectionalInput(type, val) {
-        const txt = tag('span', { contenteditable: true, class: 'edit-value' }, val);
-        const inp = tag('input', { type, value: val, class: `edit-value-${type}-input` });
+    bidirectionalInput(type, value) {
+        const txt = tag('span', { contenteditable: true, class: 'edit-value' }, value);
+        const inp = tag('input', { type, value, class: `edit-value-${type}-input` });
         const line = tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
         txt.addEventListener('focus', () => line.classList.add('focused'));
         txt.addEventListener('blur', () => line.classList.remove('focused'));
-        txt.addEventListener('input', () => inp.value = txt.innerText);
+        txt.addEventListener('input', () => inp.value = txt.innerText.trim());
         inp.addEventListener('focus', () => line.classList.add('focused'));
         inp.addEventListener('blur', () => line.classList.remove('focused'));
-        inp.addEventListener('input', () => txt.innerText = inp.value);
+        inp.addEventListener('input', () => txt.innerText = inp.value.trim());
         return line;
     }
 
