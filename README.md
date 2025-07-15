@@ -1,28 +1,58 @@
 # EditJSON
 
-**EditJSON** is a minimal JS module that allows users to visually edit JSON through a popup. Ideal for admin panels and settings forms where raw JSON needs to be user-editable.
+**EditJSON** is a lightweight JavaScript module that provides a visual JSON editing interface via popup. Designed for admin panels and configuration forms, it enables safe modification of JSON data without requiring technical expertise.
 
 ## Highlights
 
 -   **Dynamic item manipulation**: Add, remove, and reorder items
 -   **Type-Smart Inputs**: Automatic input selection for each data type (boolean, number, string)
--   **Date/Time Helpers**: Built-in  `date`/`time`/`datetime-local`  inputs for temporal values
--   **Color Picker**: Integrated  `color`  input for hex values
+-   **Date/Time Helpers**: Built-in `date`/`time`/`datetime-local` inputs for temporal values
+-   **Color Picker**: Integrated `color` input for hex values
 -   **Zero Dependencies**: Lightweight vanilla JS implementation
 
 ## Usage
 
-Add this to your HTML:
+### Automatic Initialization
+
+For all elements with `[data-json-editor]` attribute:
 
 ```html
 <script type="module" src="js/apply-edit-json.js"></script>
 ```
 
-This script will:
+This loader script will:
 
 -   Load the required CSS (`edit-json.css`, `popup.css`)
--   Attach the editor to elements with `data-json-editor`
-    
+-   Attach the editor to all elements with `data-json-editor`
+
+### Manual Initialization
+
+For custom implementation:
+
+```html
+<script type="module">
+    import EditJSON from 'edit-json/js/edit-json.js';
+
+    window.addEventListener('DOMContentLoaded', () => {
+        // Load for elements with the attribute [data-json-editor] set
+        EditJSON.apply();
+        
+        // Load for a single element without the attribute
+        const jsonEl = document.getElementById('json_textarea');
+        jsonEl.setAttribute('readonly', true);
+        jsonEl.addEventListener('click', () => {
+            const editor = new EditJSON(jsonEl);
+            editor.openEditor();
+        });
+
+        // Using a button to open the editor
+        const editor = new EditJSON(document.getElementById('json-textarea'));
+        document.getElementById('edit-btn').addEventListener('click', () => {
+            editor.openEditor();
+        });
+    });
+</script>
+```
 
 ### Basic Example
 
