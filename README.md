@@ -58,18 +58,20 @@ EditJSON provides simple ways to change behavior and appearance.
 
 ### Disable Controls
 
-You can disable the ability to move or remove items globally:
+You can disable the ability to insert, move or remove items, separatedly. Besides that, you can block the edition of object keys.
 
 ```js
-EditJSON.canMoveItems = false;
-EditJSON.canRemoveItems = false;
+EditJSON.canInsertItems = false; // Disables the insertion of new items in arrays/objects
+EditJSON.canMoveItems = false; // Locks item positions in arrays/objects
+EditJSON.canEditKeys = false; // Prevents modification of object property names
+EditJSON.canRemoveItems = false;  // Removes item deletion capabilities
 ```
 
 This disables the up/down arrows and remove buttons from the editor UI.
 
 ### Change Texts or Icons
 
-All interface labels and icons are stored in `EditJSON.strings`. You can replace them using the `setStrings()` method:
+All interface labels and icons are stored in `EditJSON.strings`. You can replace them using the `setStrings()` method.
 
 ```js
 EditJSON.setStrings({
@@ -89,7 +91,11 @@ This also allows you to:
 -   Replace Font Awesome icons with emojis, plain text, or your own HTML
 -   Simplify the UI by removing icons (e.g. `removeIcon: ''`)
 
-No need for Font Awesome unless you want to use it. All visual elements are fully customizable via strings.
+No need for Font Awesome unless you want to use it. All visual elements (including the Font Awesome icons) are fully customizable via strings. To do this you must replace all icons (`moveUpIcon`, `moveDownIcon`, `removeIcon`, `collapseItemIcon` e `expandItemIcon`).
+
+## Screenshots
+
+![The editor](./screenshots/json-editor.png)
 
 ## License
 

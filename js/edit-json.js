@@ -56,10 +56,14 @@ class EditJSON {
         unnamed: 'Unnamed'
     };
 
+    /** @type {Boolean} Can user insert new object / array items? */
+    static canInsertItems = true;
     /** @type {Boolean} Can user move object / array items? */
     static canMoveItems = true;
     /** @type {Boolean} Can user remove object / array items? */
     static canRemoveItems = true;
+    /** @type {Boolean} Can user edit object keys? */
+    static canEditKeys = true;
 
     /**
      * Creates a JSON editor instance
@@ -154,6 +158,7 @@ class EditJSON {
             this.htmlElement = existent;
         } else {
             const cls = 'edit-json' 
+                + (EditJSON.canInsertItems ? '' : ' no-insert') 
                 + (EditJSON.canMoveItems ? '' : ' no-move') 
                 + (EditJSON.canRemoveItems ? '' : ' no-remove');
             this.htmlElement = tag('div', {
@@ -214,7 +219,8 @@ class EditJSON {
      * @returns {HTMLElement} DIV element containing the editable field
      */
     editField(key, val) {
-        const keyText = tag('span', { contenteditable: true, spellcheck: false, class: 'edit-key' }, key);
+        const contenteditable = EditJSON.canEditKeys;
+        const keyText = tag('span', { contenteditable, spellcheck: false, class: 'edit-key' }, key);
         const cb = () => {
             if (!this.isValidKey(keyText.innerText.trim()) || this.isDuplicatedKey(keyText)) {
                 keyText.classList.add('invalid');

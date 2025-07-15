@@ -25,7 +25,7 @@ textarea[data-json-editor] {
 }
 
 .edit-json .edit-value:hover,
-.edit-json .edit-key:hover,
+.edit-json .edit-key[contenteditable="true"]:hover,
 .edit-json .add-obj-item input:hover,
 .edit-json .add-obj-item select:hover,
 .edit-json input.edit-value-number-input:hover,
@@ -166,8 +166,11 @@ textarea[data-json-editor] {
     display: none;
 }
 
-.edit-json.no-remove a.remove-item,
 .edit-json.no-remove a.remove-item {
+    display: none;
+}
+
+.edit-json.no-insert .add-obj-item {
     display: none;
 }
 
