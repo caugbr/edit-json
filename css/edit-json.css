@@ -140,8 +140,9 @@ textarea[data-json-editor] {
 .edit-array > .actions,
 .edit-object > .actions {
     position: absolute;
-    top: -4px;
+    top: 4px;
     left: 10px;
+    line-height: 16px;
 }
 
 .edit-array:hover > .actions,
@@ -170,6 +171,7 @@ textarea[data-json-editor] {
     display: none;
 }
 
+.edit-value-color .edit-value-color-input,
 .edit-value-date .edit-value-date-input {
     opacity: 0;
     position: absolute;
@@ -179,6 +181,9 @@ textarea[data-json-editor] {
     font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
 }
 
+.edit-value-color .edit-value-color-input:focus,
+.edit-value-color .edit-value-color-input:active,
+.edit-value-color.focused .edit-value-color-input,
 .edit-value-date .edit-value-date-input:focus,
 .edit-value-date .edit-value-date-input:active,
 .edit-value-date.focused .edit-value-date-input {
@@ -209,14 +214,20 @@ textarea[data-json-editor] {
 }
 
 .edit-json .add-obj-item input[type="text"] {
-    max-width: 4.4em;
+    max-width: 4.5em;
     text-align: center;
     flex-grow: 0;
     flex-shrink: 0;
 }
 
-input.edit-value-number-input,
-select.edit-value {
+.edit-json input.edit-value-color-input {
+    padding: 0;
+    height: 1.5rem;
+    vertical-align: middle;
+}
+
+.edit-json input.edit-value-number-input,
+.edit-json select.edit-value {
     line-height: 1.2rem;
     border: 0;
     max-width: 4.25em;
@@ -224,7 +235,7 @@ select.edit-value {
 
 
 
-select.edit-value {
+.edit-json select.edit-value {
   width: 200px;
   padding: 0 16px;
   border-radius: 4px;
@@ -235,14 +246,14 @@ select.edit-value {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
-select.edit-value::-ms-expand {
+.edit-json select.edit-value::-ms-expand {
   display: none;
 }
-select.edit-value {
+.edit-json select.edit-value {
   background-image: none;
 }
-select.edit-value:hover,
-select.edit-value:focus {
+.edit-json select.edit-value:hover,
+.edit-json select.edit-value:focus {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 4px center;
@@ -255,6 +266,14 @@ select.edit-value:focus {
 .popup-overlay .popup-popup {
     display: flex;
     flex-direction: column;
+}
+.popup-overlay .popup-popup header h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+.popup-overlay .popup-popup a.minimize-popup, 
+.popup-overlay .popup-popup a.maximize-popup {
+    font-size: 18px;
 }
 .popup-overlay .popup-popup article {
     overflow: auto;
@@ -270,8 +289,9 @@ select.edit-value:focus {
     flex-grow: 0;
     flex-shrink: 0;
 }
-.popup-overlay .popup-popup .footer-buttons button {
-    padding: 0.2rem 1rem;
-    border-radius: 6px;
+.popup-overlay .popup-popup footer .footer-buttons button {
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
     border: 1px solid #4C6699;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
 }

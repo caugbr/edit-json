@@ -283,16 +283,29 @@ class EditJSON {
             default:
                 const dateType = this.isDateTime(val);
                 if (dateType) {
-                    const txt = tag('span', { contenteditable: true, class: 'edit-value' }, val);
-                    const inp = tag('input', { type: dateType, value: val, class: 'edit-value-date-input' });
-                    const line = tag('span', { class: 'edit-value-date' }, [ txt, inp ]);
-                    txt.addEventListener('focus', () => line.classList.add('focused'));
-                    txt.addEventListener('blur', () => line.classList.remove('focused'));
-                    txt.addEventListener('input', () => inp.value = txt.innerText);
-                    inp.addEventListener('focus', () => line.classList.add('focused'));
-                    inp.addEventListener('blur', () => line.classList.remove('focused'));
-                    inp.addEventListener('input', () => txt.innerText = inp.value);
-                    valText = line;
+                    // const txt = tag('span', { contenteditable: true, class: 'edit-value' }, val);
+                    // const inp = tag('input', { type: dateType, value: val, class: 'edit-value-date-input' });
+                    // const line = tag('span', { class: 'edit-value-date' }, [ txt, inp ]);
+                    // txt.addEventListener('focus', () => line.classList.add('focused'));
+                    // txt.addEventListener('blur', () => line.classList.remove('focused'));
+                    // txt.addEventListener('input', () => inp.value = txt.innerText);
+                    // inp.addEventListener('focus', () => line.classList.add('focused'));
+                    // inp.addEventListener('blur', () => line.classList.remove('focused'));
+                    // inp.addEventListener('input', () => txt.innerText = inp.value);
+                    // valText = line;
+                    valText = this.bidirectionalInput(dateType, val);
+                } else if(this.isColor(val)) {
+                    // const txt = tag('span', { contenteditable: true, class: 'edit-value' }, val);
+                    // const inp = tag('input', { type: 'color', value: val, class: 'edit-value-color-input' });
+                    // const line = tag('span', { class: 'edit-value-date' }, [ txt, inp ]);
+                    // txt.addEventListener('focus', () => line.classList.add('focused'));
+                    // txt.addEventListener('blur', () => line.classList.remove('focused'));
+                    // txt.addEventListener('input', () => inp.value = txt.innerText);
+                    // inp.addEventListener('focus', () => line.classList.add('focused'));
+                    // inp.addEventListener('blur', () => line.classList.remove('focused'));
+                    // inp.addEventListener('input', () => txt.innerText = inp.value);
+                    // valText = line;
+                    valText = this.bidirectionalInput('color', val);
                 } else {
                     valText = tag('span', { contenteditable: true, class: 'edit-value' }, val);
                 }
@@ -301,6 +314,19 @@ class EditJSON {
             return tag('span', { class: 'input-wrapper' }, [valText, this.makeActions()]);
         }
         return tag('span', { class: 'input-wrapper' }, valText);
+    }
+
+    bidirectionalInput(type, val) {
+        const txt = tag('span', { contenteditable: true, class: 'edit-value' }, val);
+        const inp = tag('input', { type, value: val, class: `edit-value-${type}-input` });
+        const line = tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
+        txt.addEventListener('focus', () => line.classList.add('focused'));
+        txt.addEventListener('blur', () => line.classList.remove('focused'));
+        txt.addEventListener('input', () => inp.value = txt.innerText);
+        inp.addEventListener('focus', () => line.classList.add('focused'));
+        inp.addEventListener('blur', () => line.classList.remove('focused'));
+        inp.addEventListener('input', () => txt.innerText = inp.value);
+        return line;
     }
 
     /**
@@ -661,6 +687,15 @@ class EditJSON {
             return 'object';
         }
         return typeof variable;
+    }
+
+    /**
+     * Checks if string represents a hex color
+     * @param {string} val - Value to test
+     * @returns {boolean} TRUE is is a color
+     */
+    isColor(val) {
+        return /^#([a-f0-9]{3}|[a-f0-9]{6})$/i.test(val.trim())
     }
 
     /**

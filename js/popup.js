@@ -133,7 +133,7 @@ class Popup {
                     event.preventDefault();
                     this.maximize();
                 });
-                const minimize = tag('a', { href: '#', class: 'minimize-popup' }, '<i class="fas fa-window-minimize"></i>');
+                const minimize = tag('a', { href: '#', class: 'minimize-popup' }, '<i class="fas fa-window-restore"></i>');
                 header.appendChild(minimize);
                 minimize.addEventListener('click', event => {
                     event.preventDefault();
