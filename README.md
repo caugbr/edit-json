@@ -94,15 +94,19 @@ This also allows you to:
 No need for Font Awesome unless you want to use it. All visual elements (including the Font Awesome icons) are fully customizable via strings. To do this you must replace all icons (`moveUpIcon`, `moveDownIcon`, `removeIcon`, `collapseItemIcon` e `expandItemIcon`).
 
 ## Screenshots
-
+The editor
 ![The editor](./screenshots/json-editor.png)
 
+Item action links
 ![Item action links](./screenshots/json-editor-actions.png)
 
+Editing a boolean value
 ![Editing a boolean value](./screenshots/json-editor-boolean.png)
 
+Editing a string in date format
 ![Editing a string in date format](./screenshots/json-editor-date.png)
 
+Duplicated object key
 ![Duplicated object key](./screenshots/json-editor-invalid.png)
 
 ## License
