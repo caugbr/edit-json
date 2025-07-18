@@ -3,125 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Editor for Forms</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" integrity="sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>EditJSON - Safe JSON Editor for Web Forms</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css">
     <style>
         *, ::after, ::before {
             box-sizing: border-box;
         }
         body {
-            font-family: "Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+            font-family: "Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .ej-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .ej-logo {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 42px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .ej-logo img {
+            width: 40px;
+            height: auto;
+            margin-right: 0.8rem;
+        }
+        .tagline {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        .intro {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+        .intro h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .feature {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .feature i {
+            color: #3498db;
+            margin-right: 10px;
         }
         .example {
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            padding: 25px;
+            margin-bottom: 40px;
             border-radius: 5px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
         .example h2 {
-            color: #333;
+            color: #3498db;
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
+            margin-top: 0;
         }
         .json-trigger {
-            background-color: #4CAF50;
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
+            padding: 10px 20px;
             font-size: 14px;
-            margin: 4px 2px;
-            cursor: pointer;
             border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .json-trigger:hover {
+            background-color: #2980b9;
         }
         .json-link {
-            color: #2196F3;
+            color: #3498db;
             cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .json-link:hover {
             text-decoration: underline;
+        }
+        .json-link i {
+            margin-right: 5px;
         }
         textarea.json-data {
             width: 100%;
             min-height: 100px;
-            font-family: monospace;
-            padding: 10px;
+            font-family: 'Consolas', monospace;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            background: #f8f9fa;
         }
         .field-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        .example label {
+        .field-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
         }
-        .ej {
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 42px;
+        .schema-link {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .schema-link i {
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
-    <h1 class="ej">EditJSON</h1>
+    <header class="ej-header">
+        <div class="ej-logo">
+            <img src="edit-json.png" alt="EditJSON">EditJSON
+        </div>
+        <div class="tagline">A Safe JSON Editor for Form Fields</div>
+    </header>
 
-    <p>A user-friendly editor for JSON values in forms</p>
-    
+    <section class="intro">
+        <h2>Simplify JSON Editing in Your Forms</h2>
+        <p>EditJSON solves the challenge of letting users edit JSON data directly in web forms without requiring technical knowledge. Traditional approaches either expose systems to invalid JSON errors or force developers to build complex interfaces for simple data structures.</p>
+        
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <strong>Validation First</strong>
+                <p>Prevents syntax errors and invalid data with real-time validation</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-project-diagram"></i>
+                <strong>Schema Support</strong>
+                <p>Adapts to your JSON Schema rules for guided editing</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-magic"></i>
+                <strong>Auto-Formatting</strong>
+                <p>Maintains proper JSON structure automatically</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-star"></i>
+                <strong>Auto-Create from Schema</strong>
+                <p>Leave the field empty to auto-generate content from your JSON Schema</p>
+            </div>
+        </div>
+    </section>
+
     <div class="example">
         <h2>Clickable Textarea</h2>
-        <p>Click directly on the text field to edit the JSON</p>
+        <p>Edit JSON directly by clicking in the field. The editor validates against a schema that restricts values and structure.</p>
         
         <div class="field-group">
-            <label for="example1">Widget Settings:</label>
+            <label for="example1">Widget Configuration</label>
             <textarea 
                 id="example1" 
                 class="json-data" 
                 data-json-editor
-            >{"size":"large","color":"red","canEdit":{"header":true,"footer":true,"content":false}}</textarea>
+                data-schema="metadata"
+                placeholder="Click to edit JSON"
+            ></textarea>
+            <a class="schema-link" title="View field structure requirements">
+                <i class="fas fa-lock"></i> This field follows a specific schema
+            </a>
         </div>
     </div>
     
     <div class="example">
         <h2>Textarea with Button</h2>
-        <p>Click the button to open the editor</p>
+        <p>Trigger the editor with a button while keeping the textarea read-only.</p>
         
         <div class="field-group">
-            <label for="example2">User Preferences:</label>
+            <label for="example2">User Preferences</label>
             <button class="json-trigger" data-json-editor data-target-selector="#example2">
-                Edit JSON
+                <i class="fas fa-edit"></i> Edit JSON
             </button>
             <textarea 
                 id="example2" 
                 class="json-data" 
                 readonly
-            >{"notifications":true,"theme":"dark","language":"en","startDate":"2025-07-14","color":"#ebebeb"}</textarea>
+            >{"notifications":true,"theme":"dark","language":"en"}</textarea>
         </div>
     </div>
     
     <div class="example">
         <h2>Hidden Input with Link</h2>
-        <p>Click the link to edit the JSON that will be submitted with the form</p>
+        <p>Edit JSON stored in hidden form fields through a simple link.</p>
         
         <form id="myForm">
             <div class="field-group">
-                <label>Advanced Settings:</label>
+                <label>Advanced Settings</label>
                 <a class="json-link" data-json-editor data-target-selector="#example3">
-                    Edit advanced settings
+                    <i class="fas fa-cog"></i> Configure advanced options
                 </a>
                 <input 
                     type="hidden" 
                     id="example3" 
                     name="advanced_settings"
-                    value='{"mode":"experimental","level":5,"features":["a","b"]}'
+                    value='{"mode":"standard","features":["first","second"]}'
                 >
             </div>
         </form>
     </div>
 
+    <script>
+        window.EditJSONSchemas = {
+            metadata: {
+                "type": "object",
+                "properties": {
+                    "size": {
+                        "type": "string",
+                        "enum": ["small", "medium", "large"],
+                        "description": "Widget display size"
+                    },
+                    "color": {
+                        "type": "string",
+                        "format": "color",
+                        "description": "Primary color in hex format"
+                    },
+                    "canEdit": {
+                        "type": "object",
+                        "properties": {
+                            "header": { "type": "boolean" },
+                            "footer": { "type": "boolean" },
+                            "content": { "type": "boolean" }
+                        },
+                        "additionalProperties": false,
+                        "required": ["header", "footer"]
+                    }
+                },
+                "additionalProperties": false
+            }
+        };
+    </script>
     <script type="module" src="js/apply-edit-json.js"></script>
 </body>
 </html>

@@ -1,71 +1,243 @@
+/* === Variables === */
+:root {
+    --indentation: 2rem;
+    --hover-bg: #e9e9e9;
+    --font-size: 16px;
+    --danger-color: #a52a2a;
+    --action-color: #666666;
+    --invalid-color: #f6a3b9;
+    --line-height: 1.8;
+    --line-height-input: 1.2rem;
+    --input-padding: 2px 4px;
+    --border-radius: 4px;
+    --font-code: 'Fira Code', 'JetBrains Mono', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+    --icon-font-size: 14px;
+    --focus-outline: 1px solid #cccccc;
+    --popup-header-bg: #107ca7;
+    --popup-header-color: #ffffff;
+    --popup-button-primary-bg: #107ca7;
+    --popup-button-primary-color: #ffffff;
+    --popup-button-bg: #d9d9d9;
+    --popup-button-color: #333333;
+}
 
+/* === General Styles === */
+/* Cursor for textarea handler */
 textarea[data-json-editor] {
     cursor: pointer;
 }
 
+.disabled {
+    opacity: 0.6;
+    /* pointer-events: none; */
+}
+
+a.disabled {
+    cursor: default !important;
+}
+
+/* === Layout and Indentation === */
+/* Indentation for edit lines and array inputs */
 .edit-json .edit-line,
 .edit-json .edit-array > .input-wrapper {
-    margin-left: 2rem;
-    line-height: 1.8;
+    margin-left: var(--indentation);
+    line-height: var(--line-height);
 }
 
+/* Indentation and styling for add new item row */
 .edit-json .add-obj-item {
-    margin-left: 2rem;
-    line-height: 1.8;
+    display: flex;
+    flex-direction: row;
+    gap: 0.6rem;
+    margin-left: var(--indentation);
+    line-height: var(--line-height);
     font-size: 16px;
+    opacity: 0.3;
+    transition: opacity 200ms ease-in-out 0s;
 }
 
-.edit-json .edit-value,
+/* Show add item row on hover or focus */
+.edit-json .add-obj-item:hover,
+.edit-json .add-obj-item:has(*:focus) {
+    opacity: 1;
+}
+
+/* === Input Fields (Keys, Values, and Add Item) === */
+/* Styling for editable keys, values, and number inputs */
 .edit-json .edit-key,
+.edit-json .edit-value,
 .edit-json input.edit-value-number-input {
-    padding: 2px 4px;
-    border-radius: 4px;
+    padding: var(--input-padding);
+    border-radius: var(--border-radius);
     height: 26px;
-    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+    font-family: var(--font-code);
 }
 
-.edit-json .edit-value:hover,
-.edit-json .edit-key[contenteditable="true"]:hover,
-.edit-json .add-obj-item input:hover,
-.edit-json .add-obj-item select:hover,
-.edit-json input.edit-value-number-input:hover,
-.edit-json .add-obj-item input:hover,
-.edit-json .add-obj-item select:hover {
-    background-color: #e9e9e9;
-}
-
-.edit-json .edit-value:focus,
-.edit-json .edit-key:focus,
-.edit-json .add-obj-item input:focus,
-.edit-json .add-obj-item select:focus,
-.edit-json input.edit-value-number-input:focus,
-.edit-json .add-obj-item input:focus,
-.edit-json .add-obj-item select:focus {
-    background-color: #e9e9e9;
-    outline: 1px solid #cccccc;
-}
-
-.edit-json .edit-key.invalid {
-    background-color: #f6a3b9;
-}
-
-.edit-json .edit-value::before,
+/* Add quotes around keys and values */
 .edit-json .edit-key::before,
-.edit-json .edit-value::after,
-.edit-json .edit-key::after {
+.edit-json .edit-key::after,
+.edit-json .edit-value::before,
+.edit-json .edit-value::after {
     content: '"';
 }
 
+/* Invalid key styling */
+.edit-json .edit-key.invalid {
+    background-color: var(--invalid-color);
+}
+
+/* Hover and focus for inputs */
+.edit-json .edit-key[contenteditable="true"]:hover,
+.edit-json .edit-value:hover,
+.edit-json input.edit-value-number-input:hover,
+.edit-json .add-obj-item input:hover,
+.edit-json .add-obj-item select:hover {
+    background-color: var(--hover-bg);
+}
+
+.edit-json .edit-key:focus,
+.edit-json .edit-value:focus,
+.edit-json input.edit-value-number-input:focus,
+.edit-json .add-obj-item input:focus,
+.edit-json .add-obj-item select:focus {
+    background-color: var(--hover-bg);
+    outline: var(--focus-outline);
+}
+
+/* Styling for add item inputs */
+.edit-json .add-obj-item * {
+    line-height: var(--line-height-input);
+    border: 0;
+    padding: var(--input-padding);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size);
+    font-size: 14px;
+    min-width: 26px;
+}
+
+.edit-json .add-obj-item input[type="text"] {
+    max-width: 4.5em;
+    text-align: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+/* Number input specific styling */
+.edit-json input.edit-value-number-input {
+    line-height: var(--line-height-input);
+    border: 0;
+    display: inline-block;
+    width: 4em;
+}
+
+/* Select input styling */
+.edit-json select.edit-value {
+    padding: 0 20px 0 5px;
+    border-radius: var(--border-radius);
+    background-color: #fff;
+    font-family: inherit;
+    font-size: var(--font-size);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    line-height: var(--line-height-input);
+    border: 0;
+    display: inline-block;
+    width: auto;
+    background-image: none;
+}
+
+.edit-json select.edit-value::-ms-expand {
+    display: none;
+}
+
+.edit-json select.edit-value:hover,
+.edit-json select.edit-value:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    background-size: 16px;
+}
+
+/* Color input specific styling */
+.edit-json input.edit-value-color-input {
+    padding: 0;
+    height: 1.5rem;
+    vertical-align: middle;
+    border-radius: var(--border-radius);
+}
+
+/* Color and date input hidden state */
+.edit-json .edit-value-color .edit-value-color-input,
+.edit-json .edit-value-date .edit-value-date-input {
+    opacity: 0;
+    position: absolute;
+    clip-path: inset(0 100% 0 0);
+    margin-left: 1rem;
+    line-height: var(--line-height-input);
+    font-family: var(--font-code);
+    border-radius: var(--border-radius);
+}
+
+/* Color and date input visible state */
+.edit-json .edit-value-color .edit-value-color-input:focus,
+.edit-json .edit-value-color .edit-value-color-input:active,
+.edit-json .edit-value-color.focused .edit-value-color-input,
+.edit-json .edit-value-date .edit-value-date-input:focus,
+.edit-json .edit-value-date .edit-value-date-input:active,
+.edit-json .edit-value-date.focused .edit-value-date-input {
+    opacity: 1;
+    position: static;
+    clip-path: none;
+}
+
+/* === Object and Array Containers === */
+/* Positioning for object and array containers */
 .edit-json .edit-object,
 .edit-json .edit-array {
     position: relative;
 }
 
+/* Brackets for objects */
+.edit-json .edit-object::before {
+    content: '{';
+    font-weight: bold;
+}
+
+.edit-json .edit-object::after {
+    content: '}';
+    font-weight: bold;
+}
+
+/* Brackets for arrays */
+.edit-json .edit-array::before {
+    content: '[';
+    font-weight: bold;
+}
+
+.edit-json .edit-array::after {
+    content: ']';
+    font-weight: bold;
+}
+
+/* Array content styling */
+.edit-json .edit-array > span,
+.edit-json .edit-array > select,
+.edit-json .edit-array > input {
+    display: block;
+    margin-left: var(--indentation);
+    min-width: 26px;
+}
+
+/* === Toggle and Collapse === */
+/* Toggle links for collapsing/expanding */
 .edit-json .edit-object a.toggle,
 .edit-json .edit-array a.toggle {
     margin: auto 0.35rem;
 }
 
+/* Toggle visibility */
 .edit-json .edit-object-wrapper a.toggle.down,
 .edit-json .edit-array-wrapper a.toggle.down {
     display: none;
@@ -81,39 +253,50 @@ textarea[data-json-editor] {
     display: none;
 }
 
+/* Hide content when collapsed */
 .edit-json .edit-object-wrapper.collapsed .edit-object > *:not(.actions),
 .edit-json .edit-array-wrapper.collapsed .edit-array > *:not(.actions) {
     display: none;
 }
 
-.edit-json .edit-object::before {
-    content: '{';
-    font-weight: bold;
+/* Remove item button */
+.edit-json .edit-object > .edit-line.required .input-wrapper .remove-item {
+    display: none;
+}
+/* 
+.edit-json .show-schema {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+} */
+
+.edit-json .schema-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    color: #666666;
+    padding: 0.75rem;
 }
 
-.edit-json .edit-object::after {
-    content: '}';
-    font-weight: bold;
+.edit-json .show-schema,
+.edit-json .close-schema-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    color: #666666;
 }
 
-.edit-json .edit-array > span,
-.edit-json .edit-array > select,
-.edit-json .edit-array > input {
-    display: block;
-    margin-left: 2rem;
-    min-width: 20px;
+.edit-json .schema-overlay h3 {
+    margin-top: 0;
 }
 
-.edit-json .edit-array::before {
-    content: '[';
-    font-weight: bold;
-}
-
-.edit-json .edit-array::after {
-    content: ']';
-    font-weight: bold;
-}
-
+/* === Actions (Up, Down, Remove) === */
+/* Action buttons styling */
 .edit-json .actions {
     opacity: 0;
     transition: opacity 200ms ease;
@@ -124,19 +307,20 @@ textarea[data-json-editor] {
 
 .edit-json .actions a,
 .edit-json a.toggle {
-    font-size: 14px;
+    font-size: var(--icon-font-size);
     margin-left: 0.3rem;
     vertical-align: middle;
-    font-weight: 700;
     line-height: 1;
-    color: #666666;
+    color: var(--action-color);
 }
 
 .edit-json a.remove-item {
-    color: brown;
-    /* font-size: 1.6em; */
+    font-size: var(--icon-font-size);
+    line-height: 1;
+    color: var(--danger-color);
 }
 
+/* Position actions in arrays and objects */
 .edit-array > .actions,
 .edit-object > .actions {
     position: absolute;
@@ -145,6 +329,7 @@ textarea[data-json-editor] {
     line-height: 16px;
 }
 
+/* Show actions on hover or focus */
 .edit-array:hover > .actions,
 .edit-array > .input-wrapper:hover > .actions,
 .edit-array > .input-wrapper:has(:focus) > .actions,
@@ -154,148 +339,115 @@ textarea[data-json-editor] {
     opacity: 1;
 }
 
+/* Hide actions in root */
 .edit-json > .edit-array-wrapper:first-child > .edit-array > .actions,
 .edit-json > .edit-object-wrapper:first-child > .edit-object > .actions,
-.edit-json > .edit-array-wrapper:first-child > a.skip,
-.edit-json > .edit-object-wrapper:first-child > a.skip {
+.edit-json > .edit-array-wrapper:first-child > a.toggle,
+.edit-json > .edit-object-wrapper:first-child > a.toggle {
     display: none;
 }
 
+/* === Global and Specific Restrictions === */
+/* Hide move actions globally */
 .edit-json.no-move a.up-item,
 .edit-json.no-move a.down-item {
     display: none;
 }
 
+/* Hide remove actions globally */
 .edit-json.no-remove a.remove-item {
     display: none;
 }
 
+/* Hide add item globally */
 .edit-json.no-insert .add-obj-item {
     display: none;
 }
 
-.edit-value-color .edit-value-color-input,
-.edit-value-date .edit-value-date-input {
-    opacity: 0;
-    position: absolute;
-    clip-path: inset(0 100% 0 0);
-    margin-left: 1rem;
-    line-height: 1.2rem;
-    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+/* Disable key editing with schema */
+.edit-json.has-schema .edit-key {
+    pointer-events: none;
 }
 
-.edit-value-color .edit-value-color-input:focus,
-.edit-value-color .edit-value-color-input:active,
-.edit-value-color.focused .edit-value-color-input,
-.edit-value-date .edit-value-date-input:focus,
-.edit-value-date .edit-value-date-input:active,
-.edit-value-date.focused .edit-value-date-input {
-    opacity: 1;
-    position: static;
-    clip-path: none;
+/* Specific restrictions for move and remove */
+.edit-object.no-move-items > .edit-line > .input-wrapper .up-item,
+.edit-object.no-move-items > .edit-line > .input-wrapper .down-item,
+.edit-object.no-move-items > .edit-line > .edit-object-wrapper > .edit-object > .actions .up-item,
+.edit-object.no-move-items > .edit-line > .edit-object-wrapper > .edit-object > .actions .down-item,
+.edit-object.no-move-items > .edit-line > .edit-array-wrapper > .edit-array > .actions .up-item,
+.edit-object.no-move-items > .edit-line > .edit-array-wrapper > .edit-array > .actions .down-item,
+.edit-array.no-move-items > .input-wrapper .up-item,
+.edit-array.no-move-items > .input-wrapper .down-item {
+    display: none;
 }
 
-.edit-json .add-obj-item {
-    display: flex;
-    flex-direction: row;
-    gap: 0.6rem;
-    opacity: 0.3;
-    transition: opacity 200ms ease-in-out 0s;
+.edit-object.no-remove-items > .edit-line > .input-wrapper .remove-item,
+.edit-object.no-remove-items > .edit-line > .edit-object-wrapper > .edit-object > .actions .remove-item,
+.edit-object.no-remove-items > .edit-line > .edit-array-wrapper > .edit-array > .actions .remove-item,
+.edit-array.no-remove-items > .input-wrapper .remove-item {
+    display: none;
 }
 
-.edit-json .add-obj-item:hover,
-.edit-json .add-obj-item:has(*:focus) {
-    opacity: 1;
-}
-
-.edit-json .add-obj-item * {
-    line-height: 1.2rem;
-    border: 0;
-    padding: 2px 4px;
-    border-radius: 4px;
-    min-width: 26px;
-}
-
-.edit-json .add-obj-item input[type="text"] {
-    max-width: 4.5em;
-    text-align: center;
-    flex-grow: 0;
-    flex-shrink: 0;
-}
-
-.edit-json input.edit-value-color-input {
-    padding: 0;
-    height: 1.5rem;
-    vertical-align: middle;
-}
-
-.edit-json input.edit-value-number-input,
-.edit-json select.edit-value {
-    line-height: 1.2rem;
-    border: 0;
-    max-width: 4.25em;
-}
-
-
-
-.edit-json select.edit-value {
-  width: 200px;
-  padding: 0 16px;
-  border-radius: 4px;
-  background-color: #fff;
-  font-family: inherit;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-.edit-json select.edit-value::-ms-expand {
-  display: none;
-}
-.edit-json select.edit-value {
-  background-image: none;
-}
-.edit-json select.edit-value:hover,
-.edit-json select.edit-value:focus {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 4px center;
-  background-size: 16px;
-}
-
-
-
-
+/* === Popup Styling === */
+/* Popup overlay and container */
 .popup-overlay .popup-popup {
     display: flex;
     flex-direction: column;
     border: 1px solid #4C6699;
 }
+
+/* Popup header */
+.popup-overlay .popup-popup header {
+    background-color: var(--popup-header-bg) !important;
+}
+
+
 .popup-overlay .popup-popup header h2 {
     font-size: 20px;
     font-weight: 600;
+    color: var(--popup-header-color);
 }
-.popup-overlay .popup-popup a.minimize-popup, 
+
+/* Popup minimize/maximize buttons */
+.popup-overlay .popup-popup a.minimize-popup,
 .popup-overlay .popup-popup a.maximize-popup {
     font-size: 18px;
 }
+
+/* Popup content area */
 .popup-overlay .popup-popup article {
     overflow: auto;
     flex-grow: 6;
     flex-shrink: 6;
+    position: relative;
 }
-.popup-overlay .popup-popup header {
+
+/* Schema */
+
+/* Popup header and footer */
+.popup-overlay .popup-popup header,
+.popup-overlay .popup-popup footer {
     flex-grow: 0;
     flex-shrink: 0;
 }
+
 .popup-overlay .popup-popup footer {
     margin: 10px 16px;
-    flex-grow: 0;
-    flex-shrink: 0;
 }
+
+/* Popup footer buttons */
 .popup-overlay .popup-popup footer .footer-buttons button {
     padding: 0.4rem 1rem;
     border-radius: 8px;
-    border: 1px solid #4C6699;
+    border: 1px solid var(--popup-button-bg);
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
+    background-color: var(--popup-button-primary-bg);
+    color: var(--popup-button-primary-color);
+}
+
+.popup-overlay .popup-popup .footer-buttons button.secondary {
+    background-color: var(--popup-button-bg);
+    color: var(--popup-button-color);
+    border: 1px solid var(--popup-button-bg);
+    padding: 0.3rem 1rem;
 }

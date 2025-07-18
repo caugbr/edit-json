@@ -1,6 +1,7 @@
 // import '../css/edit-json.css';
 import Popup from './popup.js';
-import { $single, $apply, tag, isPlainObject, rootEvent } from './util.js';
+import JsonSchemaValidator from './json-schema-validator.js';
+import { $single, $apply, tag, isPlainObject, rootEvent, copyObject } from './util.js';
 
 /**
  * Classe para edição interativa de JSON em uma interface popup
@@ -25,6 +26,12 @@ class EditJSON {
 
     /** @type {Popup|null} Popup instance */
     popup = null;
+
+    /** @type {Object} JSON Schema to validate root element */
+    schema = null;
+
+    /** @type {Object} JSON Schemas repository */
+    static schemas = {};
 
     /** @type {string} CSS selector for trigger elements */
     static selector = '[data-json-editor]';
@@ -53,29 +60,51 @@ class EditJSON {
         elementNotFound: 'Target element not found',
         invalidJson: 'Invalid JSON',
         jsonNotSet: 'JSON is not set',
-        unnamed: 'Unnamed'
+        unnamed: 'Unnamed',
+        schemaNotFound: 'Schema %s not found in EditJSON.schemas',
+        lockIcon: '<i class="fas fa-lock"></i>',
+        closeIcon: '<i class="fas fa-times"></i>',
+        viewSchema: 'View JSON schema for this field',
+        hasSchema: 'There is a JSON schema for this field',
+        viewSchemaTitle: 'Structure and validation rules for this field'
     };
 
-    /** @type {Boolean} Can user insert new object / array items? */
-    static canInsertItems = true;
-    /** @type {Boolean} Can user move object / array items? */
-    static canMoveItems = true;
-    /** @type {Boolean} Can user remove object / array items? */
-    static canRemoveItems = true;
-    /** @type {Boolean} Can user edit object keys? */
-    static canEditKeys = true;
+    static config = {
+        /** @type {Boolean} Can user insert new object / array items? */
+        insertItems: true,
+        /** @type {Boolean} Can user move object / array items? */
+        moveItems: true,
+        /** @type {Boolean} Can user remove object / array items? */
+        removeItems: true,
+        /** @type {Boolean} Can user edit object keys? */
+        editKeys: true,
+        /** @type {Boolean} Let users see the JSON Schema? */
+        visibleSchema: true
+    };
+
+    config = null;
+    currentPath = ['root'];
 
     /**
      * Creates a JSON editor instance
      * @constructor
      * @param {HTMLElement|null} jsonElement - JSON input/output element
      */
-    constructor(jsonElement = null) {
+    constructor(jsonElement = null, schema = null, config = null) {
+        
+        this.setConfig(config);
+        if (schema) {
+            this.setSchema(schema);
+        }
         if (jsonElement) {
+            if (this.schema && !jsonElement.value) {
+                const jsn = JsonSchemaValidator.generateFromSchema(this.schema);
+                jsonElement.value = JSON.stringify(jsn);
+            }
             this.set(jsonElement);
         }
-        if (!window.ejRemoveEventSet) {
-            window.ejRemoveEventSet = true;
+
+        if (!window.ejEventsAreSet) {
             rootEvent('a.remove-item', 'click', async event => {
                 event.preventDefault();
                 await this.removeItem(event.target);
@@ -88,7 +117,16 @@ class EditJSON {
                 event.preventDefault();
                 this.downItem(event.target);
             });
+            window.ejEventsAreSet = true;
         }
+    }
+
+    /**
+     * Set config
+     * @param {Object} config - Config object
+     */
+    setConfig(config = null) {
+        this.config = config ?? EditJSON.config;
     }
 
     /**
@@ -98,6 +136,14 @@ class EditJSON {
      */
     static setStrings(obj) {
         this.strings = { ...this.strings, ...obj };
+    }
+
+    /**
+     * Set JSON Schema
+     * @param {Object} schema - Schema
+     */
+    setSchema(schema) {
+        this.schema = schema;
     }
 
     /**
@@ -118,8 +164,18 @@ class EditJSON {
                 el.setAttribute('readonly', true);
             }
 
+            let schema = null;
+            const schemaKey = el.dataset.schema;
+            if (schemaKey) {
+                if (!!EditJSON.schemas[schemaKey]) {
+                    schema = copyObject(EditJSON.schemas[schemaKey]);
+                } else {
+                    console.warn(this.strings.schemaNotFound.replace('%s', schemaKey));
+                }
+            }
+
+            const editor = new EditJSON(jsonEl, schema);
             el.addEventListener('click', () => {
-                const editor = new EditJSON(jsonEl);
                 editor.openEditor();
             });
         });
@@ -131,6 +187,7 @@ class EditJSON {
      * @returns {boolean} True if JSON was parsed successfully
      */
     set(jsonElement) {
+        console.log('set', jsonElement.value)
         this.jsonElement = jsonElement;
         this.id = jsonElement.id || jsonElement.name || EditJSON.strings.unnamed;
         this.jsonText = jsonElement.value.trim();
@@ -158,9 +215,10 @@ class EditJSON {
             this.htmlElement = existent;
         } else {
             const cls = 'edit-json' 
-                + (EditJSON.canInsertItems ? '' : ' no-insert') 
-                + (EditJSON.canMoveItems ? '' : ' no-move') 
-                + (EditJSON.canRemoveItems ? '' : ' no-remove');
+                + (this.schema === null ? '' : ' has-schema') 
+                + (this.config.insertItems ? '' : ' no-insert') 
+                + (this.config.moveItems ? '' : ' no-move') 
+                + (this.config.removeItems ? '' : ' no-remove');
             this.htmlElement = tag('div', {
                 id: `__ej_${this.id}`,
                 class: cls,
@@ -175,7 +233,7 @@ class EditJSON {
      * @returns {boolean} False if no data to edit
      */
     edit() {
-        if (!this.jsonData) {
+        if (!this.jsonElement) {
             console.error(EditJSON.strings.jsonNotSet);
             return false;
         }
@@ -188,6 +246,30 @@ class EditJSON {
         }
 
         this.htmlElement.appendChild(elem);
+        this.showSchemaLink();
+    }
+
+    showSchemaLink() {
+        if (this.schema) {
+            const showSchema = tag(
+                'a', 
+                { class: 'show-schema disabled', title: EditJSON.strings.hasSchema }, 
+                EditJSON.strings.lockIcon
+            );
+            if (this.config.visibleSchema) {
+                showSchema.title = EditJSON.strings.viewSchema;
+                showSchema.classList.remove('disabled');
+                showSchema.addEventListener('click', () => {
+                    const close = tag('a', { class: 'close-schema-overlay' }, EditJSON.strings.closeIcon);
+                    close.addEventListener('click', () => overlay.remove());
+                    const wrap = tag('pre', { class: 'wrap-schema' }, JSON.stringify(this.schema, null, 4));
+                    const wrapper = tag('div', {}, [tag('h3', {}, EditJSON.strings.viewSchemaTitle), wrap]);
+                    const overlay = tag('div', { class: 'schema-overlay' }, [close, wrapper]);
+                    this.htmlElement.appendChild(overlay);
+                });
+            }
+            this.htmlElement.appendChild(showSchema);
+        }
     }
 
     /**
@@ -204,12 +286,46 @@ class EditJSON {
         cancelButton.addEventListener('click', () => this.popup.close());
         okButton.addEventListener('click', () => {
             const json = this.extractFromHtml();
+            if (null !== this.schema) {
+                const jsv = new JsonSchemaValidator(this.schema);
+                const errors = jsv.validate(json);
+                console.log('errors', errors)
+            }
             this.jsonElement.value = JSON.stringify(json, null, 4);
             this.popup.close();
         });
         this.popup.addFooterButton(cancelButton);
         this.popup.addFooterButton(okButton);
         this.popup.open();
+        setTimeout(() => this.applyRequiredClass(), 120);
+    }
+
+    /**
+     * Generates a <select> for a key with an enum in the schema, based on currentPath.
+     * @returns {string|false} - HTML for <select> if enum exists, false otherwise.
+     */
+    enumField(value, path = null) {
+        if (!this.schema) {
+            return false;
+        }
+        const schema = this.getSchemaForPath(path ?? this.getCurrentPath()) || {};
+        const values = schema.enum ?? null;
+        if (values) {
+            const options = [];
+            values.forEach(val => {
+                const attrs = { value: val }
+                if (value === val) {
+                    attrs.selected = true;
+                }
+                options.push(tag('option', attrs, typeof val == 'string' ? `"${val}"` : val));
+            });
+            const attrs = { id: `enum_${this.currentPath.join('_')}`, class: 'edit-value' };
+            if (schema.ejCanEditKeys === false) {
+                attrs.disabled = true;
+            }
+            return tag('select', attrs, options);
+        }
+        return false;
     }
 
     /**
@@ -219,7 +335,9 @@ class EditJSON {
      * @returns {HTMLElement} DIV element containing the editable field
      */
     editField(key, val) {
-        const contenteditable = EditJSON.canEditKeys;
+        this.currentPath.push(key); // Acrescenta chave ao path
+        const schema = this.getSchemaForPath(this.getCurrentPath()) || null;
+        const contenteditable = schema ? false : this.config.editKeys;
         const keyText = tag('span', { contenteditable, spellcheck: false, class: 'edit-key' }, key);
         const cb = () => {
             if (!this.isValidKey(keyText.innerText.trim()) || this.isDuplicatedKey(keyText)) {
@@ -241,11 +359,13 @@ class EditJSON {
             default:
                 valText = this.valHtml(val);
         }
-        return tag('div', {class: 'edit-line'}, [ keyText, ": ", valText ]);
+        const attrs = { class: 'edit-line', 'data-path': this.getCurrentPath() };
+        this.currentPath.pop(); // Decresce path
+        return tag('div', attrs, [ keyText, ": ", valText ]);
     }
 
     /**
-     * Returs all keys of the given object, as an array of strings
+     * Returs all keys of the elem parent object, as an array of strings
      * @param {HTMLElement} elem - Element inside the object (or the object itself)
      * @returns {string[]} Array with all object keys
      */
@@ -255,13 +375,41 @@ class EditJSON {
         return Array.from(keyEls).map(e => e.innerText.trim());
     }
 
+    applyRequiredClass(obj = null) {
+        if (!this.schema) {
+            return;
+        }
+        const root = obj ?? $single('.popup-popup .edit-json [data-path="root"]');
+        if (!root) {
+            return;
+        }
+        const path = root.dataset?.path ?? '';
+        const schema = this.getSchemaForPath(path);
+        console.log('applyRequiredClass', schema)
+        const required = schema.required ?? [];
+        const props = root.children; // Pega todos os filhos diretos
+        const editLines = Array.from(props).filter(el => el.matches('.edit-line'));
+
+        editLines.forEach(prop => {
+            const key = $single('.edit-key', prop).innerText;
+            console.log('KEY', key)
+            if (required.includes(key)) {
+                prop.classList.add('required');
+            }
+            const innerObj = prop.querySelector('.edit-object');
+            if (innerObj) {
+                this.applyRequiredClass(innerObj);
+            }
+        });
+    }
+
     /**
      * Creates appropriate HTML for value based on its type
      * @param {*} val - Value to render
      * @param {boolean} [actions=true] - Whether to include action buttons
      * @returns {HTMLElement} Element containing the edit control
      */
-    valHtml(val, actions = true) {
+    valHtml(val, actions = true, path = '') {
         let valText;
         switch (this.getType(val)) {
             case 'boolean':
@@ -269,10 +417,11 @@ class EditJSON {
                 if (true === val) yes.selected = true;
                 const no = { value: 'false' };
                 if (false === val) no.selected = true;
-                valText = tag('select', { class: 'edit-value' }, [
-                    tag('option', yes, 'true'),
-                    tag('option', no, 'false')
-                ]);
+                valText = tag(
+                    'select', 
+                    { class: 'edit-value'},
+                    [ tag('option', yes, 'true'), tag('option', no, 'false') ]
+                );
                 break;
             case 'null':
                 valText = tag('span', {}, 'null');
@@ -284,57 +433,76 @@ class EditJSON {
                 valText = this.editObject(val);
                 break;
             case 'number':
-                valText = tag('input', { type: 'number', value: val, class: 'edit-value-number-input' });
+                valText = tag('input', { 
+                    type: 'number', 
+                    value: val, 
+                    class: 'edit-value-number-input'
+                });
                 break;
             default:
                 const dateType = this.isDateTime(val);
                 if (dateType) {
-                    valText = this.bidirectionalInput(dateType, val);
-                } else if(this.isColor(val)) {
-                    valText = this.bidirectionalInput('color', val);
+                    valText = this.bidirectTextInput(dateType, val);
+                } else if (this.isColor(val)) {
+                    valText = this.bidirectTextInput('color', val);
                 } else {
-                    valText = tag('span', { contenteditable: true, class: 'edit-value' }, val);
+                    valText = this.enumField(val) || tag('span', { contenteditable: true, class: 'edit-value' }, val);
                 }
         }
-        if (actions) {
-            return tag('span', { class: 'input-wrapper' }, [valText, this.makeActions()]);
+        const attrs = { class: 'input-wrapper' };
+        if (path) {
+            attrs['data-path'] = path;
         }
-        return tag('span', { class: 'input-wrapper' }, valText);
+        if (actions) {
+            return tag('span', attrs, [valText, this.makeActions()]);
+        }
+        return tag('span', attrs, valText);
     }
 
-    bidirectionalInput(type, value) {
+    bidirectTextInput(type, value) {
         const txt = tag('span', { contenteditable: true, class: 'edit-value' }, value);
         const inp = tag('input', { type, value, class: `edit-value-${type}-input` });
+        const line = tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
         txt.addEventListener('focus', () => line.classList.add('focused'));
         txt.addEventListener('blur', () => line.classList.remove('focused'));
         txt.addEventListener('input', () => inp.value = txt.innerText.trim());
         inp.addEventListener('focus', () => line.classList.add('focused'));
         inp.addEventListener('blur', () => line.classList.remove('focused'));
         inp.addEventListener('input', () => txt.innerText = inp.value.trim());
-        return tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
+        return line;
     }
 
     /**
      * Creates action buttons (remove, move up/down)
      * @returns {HTMLElement} Action buttons container
      */
-    makeActions() {
-        const removeButton = tag(
-            'a', 
-            { href: '#', title: EditJSON.strings.removeTitle, class: 'remove-item skip' }, 
-            EditJSON.strings.removeIcon
-        );
-        const upButton = tag(
-            'a', 
-            { href: '#', class: 'up-item skip', title: EditJSON.strings.moveUpTitle }, 
-            EditJSON.strings.moveUpIcon
-        );
-        const downButton = tag(
-            'a', 
-            { href: '#', class: 'down-item skip', title: EditJSON.strings.moveDownTitle }, 
-            EditJSON.strings.moveDownIcon
-        );
-        return tag('div', { class: 'actions skip' }, [removeButton, upButton, downButton]);
+    makeActions(cfg = null) {
+        const elems = [];
+        if (cfg?.canRemove ?? this.config.removeItems) {
+            const removeButton = tag('a', { 
+                href: '#', 
+                title: EditJSON.strings.removeTitle, 
+                'data-skip': true,
+                class: 'remove-item' 
+            }, EditJSON.strings.removeIcon);
+            elems.push(removeButton);
+        }
+        if (cfg?.canMove ?? this.config.moveItems) {
+            const upButton = tag('a', { 
+                href: '#', 
+                class: 'up-item', 
+                'data-skip': true,
+                title: EditJSON.strings.moveUpTitle 
+            }, EditJSON.strings.moveUpIcon);
+            const downButton = tag('a', { 
+                href: '#', 
+                class: 'down-item', 
+                'data-skip': true,
+                title: EditJSON.strings.moveDownTitle 
+            }, EditJSON.strings.moveDownIcon);
+            elems.push(upButton, downButton);
+        }
+        return tag('div', { class: 'actions', 'data-skip': true }, elems);
     }
 
     /**
@@ -343,14 +511,35 @@ class EditJSON {
      * @returns {HTMLElement} SPAN element containing array items
      */
     editArray(arr) {
+        const schema = this.getSchemaForPath(this.getCurrentPath()) || null;
+        const canInsert = schema ? schema.ejCanInsertItems ?? this.config.insertItems : this.config.insertItems;
+        const canMove = schema ? schema.ejCanMoveItems ?? this.config.moveItems : this.config.moveItems;
+        const canRemove = schema ? schema.ejCanRemoveItems ?? this.config.removeItems : this.config.removeItems;
         const items = [];
-        arr.forEach(item => {
-            items.push(this.valHtml(item));
+        arr.forEach((item, index) => {
+            this.currentPath.push(index);
+            items.push(this.valHtml(item, true, this.getCurrentPath()));
+            this.currentPath.pop();
         });
-        items.push(this.newArrayItem());
-        items.push(this.makeActions());
-        const editor = tag('span', { class: 'edit-array' }, items);
-        return tag('span', { class: 'edit-array-wrapper' }, [ ...this.toggleLinks(), editor ]);
+        if (canInsert) {
+            if (schema) {
+                if (!schema.maxItems || arr.length < schema.maxItems) {
+                    items.push(this.newArrayItem());
+                }
+            } else {
+                items.push(this.newArrayItem());
+            }
+        }
+        items.push(this.makeActions({canMove, canRemove}));
+        const cls = ['edit-array'];
+        if (canMove === false) {
+            cls.push('no-move-items');
+        }
+        if (canRemove === false) {
+            cls.push('no-remove-items');
+        }
+        const editor = tag('span', { class: cls.join(' '), 'data-path': this.getCurrentPath() }, items);
+        return tag('span', { class: 'edit-array-wrapper' }, [...this.toggleLinks(), editor]);
     }
 
     /**
@@ -373,7 +562,7 @@ class EditJSON {
         addButton.addEventListener('click', event => {
             this.addItem(event.target);
         });
-        return tag('div', { class: 'add-obj-item skip' }, [ valField, addButton ]);
+        return tag('div', { class: 'add-obj-item', 'data-skip': true }, [ valField, addButton ]);
     }
 
     /**
@@ -382,38 +571,58 @@ class EditJSON {
      * @returns {HTMLElement} SPAN element containing object fields
      */
     editObject(obj) {
+        const schema = this.getSchemaForPath(this.getCurrentPath()) || {};
+        const canInsert = schema ? schema.ejCanInsertItems ?? this.config.insertItems : this.config.insertItems;
+        const canMove = schema ? schema.ejCanMoveItems ?? this.config.moveItems : this.config.moveItems;
+        const canRemove = schema ? schema.ejCanRemoveItems ?? this.config.removeItems : this.config.removeItems;
         const lines = [];
         for (const key in obj) {
             lines.push(this.editField(key, obj[key]));
         }
-        lines.push(this.newObjectItem());
-        lines.push(this.makeActions());
-        const editor = tag('span', { class: 'edit-object' }, lines);
-        return tag('span', { class: 'edit-object-wrapper' }, [ ...this.toggleLinks(), editor ]);
+        if (canInsert) {
+            if (schema) {
+                if (schema.additionalProperties !== false) {
+                    lines.push(this.newObjectItem(schema.additionalProperties?.type ?? null));
+                }
+            } else {
+                lines.push(this.newObjectItem());
+            }
+        }
+        lines.push(this.makeActions({canMove, canRemove}));
+        const cls = ['edit-object'];
+        if (canMove === false) {
+            cls.push('no-move-items');
+        }
+        if (canRemove === false) {
+            cls.push('no-remove-items');
+        }
+        const editor = tag('span', { class: cls.join(' '), 'data-path': this.getCurrentPath() }, lines);
+        return tag('span', { class: 'edit-object-wrapper' }, [...this.toggleLinks(), editor]);
     }
 
     /**
      * Creates interface for adding new object property
      * @returns {HTMLElement} DIV with add controls
      */
-    newObjectItem() {
+    newObjectItem(types = null) {
+        types = types ?? ['string', 'number', 'boolean', 'array', 'object'];
+        if (!Array.isArray(types)) {
+            types = [types];
+        }
         const keyField = tag('input', { type: 'text', class: 'key', placeholder: EditJSON.strings.newKey });
         keyField.addEventListener('input', event => this.enableAddButton(event.target));
         const keyEl = tag('span', {}, ['"', keyField, '": ']);
-        const valField = tag('select', { class: 'value' }, [
-            tag('option', { value: '', selected: true, disabled: true }, EditJSON.strings.selectType),
-            tag('option', { value: 'string' }, 'string'),
-            tag('option', { value: 'number' }, 'number'),
-            tag('option', { value: 'boolean' }, 'boolean'),
-            tag('option', { value: 'array' }, 'array'),
-            tag('option', { value: 'object' }, 'object')
-        ]);
+
+        const options = [tag('option', { value: '', selected: true, disabled: true }, EditJSON.strings.selectType)];
+        types.forEach(tp => options.push(tag('option', { value: tp }, tp)));
+        const valField = tag('select', { class: 'value' }, options);
         valField.addEventListener('input', event => this.enableAddButton(event.target));
+        
         const addButton = tag('button', { type: 'button', disabled: true }, EditJSON.strings.add);
         addButton.addEventListener('click', event => {
             this.addItem(event.target);
         });
-        return tag('div', { class: 'add-obj-item skip' }, [ keyEl, valField, addButton ]);
+        return tag('div', { class: 'add-obj-item', 'data-skip': true }, [ keyEl, valField, addButton ]);
     }
 
     /**
@@ -421,16 +630,18 @@ class EditJSON {
      * @returns {HTMLElement[]} Array of toggle elements
      */
     toggleLinks() {
-        const toggleUp = tag(
-            'a', 
-            { class: 'toggle up skip', title: EditJSON.strings.collapseItemTitle, href: '#' }, 
-            EditJSON.strings.collapseItemIcon
-        );
-        const toggleDown = tag(
-            'a', 
-            { class: 'toggle down skip', title: EditJSON.strings.expandItemTitle, href: '#' }, 
-            EditJSON.strings.expandItemIcon
-        );
+        const toggleUp = tag('a', { 
+            class: 'toggle up', 
+            'data-skip': true,
+            title: EditJSON.strings.collapseItemTitle, 
+            href: '#' 
+        }, EditJSON.strings.collapseItemIcon);
+        const toggleDown = tag('a', { 
+            class: 'toggle down', 
+            'data-skip': true,
+            title: EditJSON.strings.expandItemTitle, 
+            href: '#' 
+        }, EditJSON.strings.expandItemIcon);
         toggleUp.addEventListener('click', event => {
             event.preventDefault();
             this.toggleUp(event.target);
@@ -500,6 +711,11 @@ class EditJSON {
         this.moveItem(elem, 'down');
     }
 
+    /**
+     * Check for duplicated keys in objects
+     * @param {string} key - Key to be validated
+     * @returns {boolean}
+     */
     isDuplicatedKey(key) {
         const wrapper = key.closest('.edit-object');
         const keys = wrapper.querySelectorAll('.edit-key');
@@ -508,8 +724,8 @@ class EditJSON {
     }
 
     /**
-     * Valida chaves de objetos JSON
-     * @param {string} key - Chave a ser validada
+     * Validates the typed key
+     * @param {string} key - Key to be validated
      * @returns {boolean}
      */
     isValidKey(key) {
@@ -528,7 +744,7 @@ class EditJSON {
         const button = div.querySelector('button');
         let disabled = div.querySelector('select').value == '';
         const input = div.querySelector('input');
-        if (input && !input.value) {
+        if (input && (!input.value || !this.isValidKey(input.value))) {
             disabled = true;
         }
         button.disabled = disabled;
@@ -542,7 +758,7 @@ class EditJSON {
         const iniVals = {
             string: '',
             number: 0,
-            boolean: true,
+            boolean: false,
             array: [],
             object: {}
         };
@@ -600,7 +816,7 @@ class EditJSON {
                 for (const line of lines) {
                     const keyEl = line.querySelector('.edit-key');
                     const key = keyEl?.innerText.trim();
-                    const valContainer = [...line.children].find(el => el !== keyEl && !el.matches('.skip'));
+                    const valContainer = [...line.children].find(el => el !== keyEl && !el.matches('[data-skip]'));
                     if (!key || !valContainer) continue;
 
                     const value = extractValue(valContainer);
@@ -680,7 +896,7 @@ class EditJSON {
      * @returns {boolean} TRUE is is a color
      */
     isColor(val) {
-        return /^#([a-f0-9]{3}|[a-f0-9]{6})$/i.test(val.trim())
+        return /^#([a-f0-9]{3}|[a-f0-9]{6})$/i.test(val.trim());
     }
 
     /**
@@ -701,6 +917,45 @@ class EditJSON {
             }
         }
         return false;
+    }
+
+    getCurrentPath() {
+        const path = this.currentPath.join('.');
+        return path.replace(/\.([0-9]+)(?=\.|$)/g, "[$1]");
+    }
+
+    /**
+     * Retrieves the schema for a given path in the JSON structure.
+     * @param {string} path - The path to the node (e.g., 'root.obj1.arr[0].chave').
+     * @returns {object|null} - The schema for the path, or null if not found.
+     */
+    getSchemaForPath(path) {
+        if (!this.schema) {
+            return null;
+        }
+        const pathParts = path.split(/\.|\[|\]\.?/).filter(part => part);
+        let currentSchema = this.schema;
+        for (const part of pathParts) {
+            if (!currentSchema) {
+                return null;
+            }
+            if (part === 'root' && pathParts[0] === 'root') {
+                continue;
+            }
+            if (part.match(/^\d+$/) && currentSchema.items) {
+                currentSchema = currentSchema.items;
+            }
+            else if (currentSchema.properties && currentSchema.properties[part]) {
+                currentSchema = currentSchema.properties[part];
+            }
+            else if (currentSchema.additionalProperties && typeof currentSchema.additionalProperties === 'object') {
+                currentSchema = currentSchema.additionalProperties;
+            }
+            else {
+                return null;
+            }
+        }
+        return currentSchema || null;
     }
 }
 
