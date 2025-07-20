@@ -1,3 +1,5 @@
+import Strings from "./strings.js";
+
 class JsonSchemaValidator {
     schema = null;
     
@@ -6,13 +8,13 @@ class JsonSchemaValidator {
         this.formats = {
             date: /^\d{4}-\d{2}-\d{2}$/,
             time: /^\d{2}:\d{2}(:\d{2})?$/,
-            'datetime-local': /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/,
+            'date-time': /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/,
             color: /^#([0-9a-f]{6}|[0-9a-f]{3})$/i,
             email: /^[^\s@]+@[^\s@]+\.[a-z0-9]{2,10}$/
         };
     }
 
-    validate(json, schema = null, path = '') {
+    validate(json, schema = null, path = 'root') {
         if (!schema) {
             if (!this.schema) {
                 return [];
@@ -23,14 +25,14 @@ class JsonSchemaValidator {
 
         // Valida tipo do nó raiz
         if (schema.type && !this.validateType(json, schema.type)) {
-            errors.push(`${path || 'root'}: este elemento deve ser do tipo ${schema.type}`);
+            errors.push(Strings.get('typeNotMatch', 'error', { path, type: schema.type }));
         }
 
         // Valida campos obrigatórios
         if (schema.required) {
             for (const key of schema.required) {
                 if (!(key in json)) {
-                    errors.push(`${path}${path ? '.' : ''}${key}: campo obrigatório ausente`);
+                    errors.push(Strings.get('missingRequired', 'error', { path: `${path}${path ? '.' : ''}${key}` }));
                 }
             }
         }
@@ -39,7 +41,7 @@ class JsonSchemaValidator {
         if (schema.properties) {
             for (const key in json) {
                 if (!(key in schema.properties) && schema.additionalProperties === false) {
-                    errors.push(`${path}${path ? '.' : ''}${key}: campo não permitido`);
+                    errors.push(Strings.get('notAllowedField', 'error', { path: `${path}${path ? '.' : ''}${key}` }));
                     continue;
                 }
                 if (key in schema.properties) {
@@ -48,48 +50,67 @@ class JsonSchemaValidator {
                     const newPath = path ? `${path}.${key}` : key;
 
                     // Valida tipo
-                    if (propSchema.type && !this.validateType(value, propSchema.type)) {
-                        errors.push(`${newPath}: deve ser do tipo ${propSchema.type}`);
+                    if (Array.isArray(propSchema.type)) {
+                        if (!propSchema.type.some(t => this.validateType(value, t))) {
+                            errors.push(Strings.get('typeNotMatchArr', 'error', { path: newPath, types: propSchema.type.join(', ') }));
+                        }
+                    } else {
+                        if (propSchema.type && !this.validateType(value, propSchema.type)) {
+                            errors.push(Strings.get('typeNotMatch', 'error', { path: newPath, type: propSchema.type }));
+                        }
+                    }
+
+                    // Padrões regex para strings (pattern)
+                    if (propSchema.pattern && typeof value === 'string') {
+                        const regex = new RegExp(propSchema.pattern)
+                        if (!regex.test(value)) {
+                            errors.push(Strings.get('patternNotMatch', 'error', { path: newPath, pattern: propSchema.pattern }));
+                        }
+                    }
+
+                    // Validação de const (valor exato)
+                    if ('const' in propSchema && !this.deepEqual(value, propSchema.const)) {
+                        errors.push(Strings.get('constDifferent', 'error', { path: newPath, const: propSchema.const }));
                     }
 
                     // Valida formato (para strings)
                     if (propSchema.type === 'string' && propSchema.format) {
                         if (!this.validateFormat(value, propSchema.format)) {
-                            errors.push(`${newPath}: deve ser um ${propSchema.format} válido`);
+                            errors.push(Strings.get('invalidFormat', 'error', { path: newPath, format: propSchema.format }));
                         }
                     }
 
                     // Valida restrições de string
                     if (propSchema.minLength && typeof value === 'string' && value.length < propSchema.minLength) {
-                        errors.push(`${newPath}: deve ter pelo menos ${propSchema.minLength} caracteres`);
+                        errors.push(Strings.get('tooFewChars', 'error', { path: newPath, min: propSchema.minLength }));
                     }
                     if (propSchema.maxLength && typeof value === 'string' && value.length > propSchema.maxLength) {
-                        errors.push(`${newPath}: deve ter no máximo ${propSchema.maxLength} caracteres`);
+                        errors.push(Strings.get('tooMuchChars', 'error', { path: newPath, max: propSchema.maxLength }));
                     }
 
                     // Valida restrições de número
                     if (propSchema.minimum && typeof value === 'number' && value < propSchema.minimum) {
-                        errors.push(`${newPath}: deve ser maior ou igual a ${propSchema.minimum}`);
+                        errors.push(Strings.get('tooLowerNumber', 'error', { path: newPath, min: propSchema.minimum }));
                     }
                     if (propSchema.maximum && typeof value === 'number' && value > propSchema.maximum) {
-                        errors.push(`${newPath}: deve ser menor ou igual a ${propSchema.maximum}`);
+                        errors.push(Strings.get('tooHigherNumber', 'error', { path: newPath, max: propSchema.maximum }));
                     }
 
                     // Valida enum
                     if (propSchema.enum && !propSchema.enum.includes(value)) {
-                        errors.push(`${newPath}: deve ser um dos valores: ${propSchema.enum.join(', ')}`);
+                        errors.push(Strings.get('enumOutOfRange', 'error', { path: newPath, enum: propSchema.enum.join(', ') }));
                     }
 
                     // Valida arrays
                     if (propSchema.type === 'array' && Array.isArray(value)) {
                         if (propSchema.minItems && value.length < propSchema.minItems) {
-                            errors.push(`${newPath}: deve ter pelo menos ${propSchema.minItems} itens`);
+                            errors.push(Strings.get('tooFewElements', 'error', { path: newPath, min: propSchema.minItems }));
                         }
                         if (propSchema.maxItems && value.length > propSchema.maxItems) {
-                            errors.push(`${newPath}: deve ter no máximo ${propSchema.maxItems} itens`);
+                            errors.push(Strings.get('tooMuchElements', 'error', { path: newPath, max: propSchema.maxItems }));
                         }
                         if (propSchema.uniqueItems && !this.validateUniqueItems(value)) {
-                            errors.push(`${newPath}: itens devem ser únicos`);
+                            errors.push(Strings.get('notUnique', 'error', { path: newPath }));
                         }
                         if (propSchema.items) {
                             for (let i = 0; i < value.length; i++) {
