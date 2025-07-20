@@ -44,6 +44,15 @@ a.disabled {
     line-height: var(--line-height);
 }
 
+.edit-json .edit-line .description {
+    margin-left: 1rem;
+    color: #aaaaaa;
+    font-style: italic;
+    font-size: 0.8em;
+    opacity: 0;
+    transition: opacity 200ms ease;
+}
+
 /* Indentation and styling for add new item row */
 .edit-json .add-obj-item {
     display: flex;
@@ -260,7 +269,9 @@ a.disabled {
 }
 
 /* Remove item button */
-.edit-json .edit-object > .edit-line.required .input-wrapper .remove-item {
+.edit-json .edit-object > .edit-line.required .input-wrapper .remove-item,
+.edit-json .edit-object > .edit-line.required .edit-object .remove-item,
+.edit-json .edit-object > .edit-line.required .edit-array .remove-item {
     display: none;
 }
 /* 
@@ -324,13 +335,15 @@ a.disabled {
 .edit-array > .actions,
 .edit-object > .actions {
     position: absolute;
-    top: 4px;
+    top: 2px;
     left: 10px;
     line-height: 16px;
 }
 
 /* Show actions on hover or focus */
 .edit-array:hover > .actions,
+.edit-json .edit-line:hover .description,
+.edit-json .edit-line:has(:focus) .description,
 .edit-array > .input-wrapper:hover > .actions,
 .edit-array > .input-wrapper:has(:focus) > .actions,
 .edit-object:hover > .actions,

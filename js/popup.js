@@ -195,7 +195,7 @@ class Popup {
 
     hasScrollbar() {
         const div = $single('.popup-overlay .popup-popup');
-        return this.elementHasScrollbar = (div.scrollHeight > div.clientHeight);
+        return this.elementHasScrollbar = div ? (div.scrollHeight > div.clientHeight) : false;
     }
 
     on(evName, callback) {

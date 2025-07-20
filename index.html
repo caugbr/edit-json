@@ -240,7 +240,12 @@
                     "color": {
                         "type": "string",
                         "format": "color",
-                        "description": "Primary color in hex format"
+                        "description": "Primary color in hex / rgb / grba format"
+                    },
+                    "day": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Date of your day"
                     },
                     "canEdit": {
                         "type": "object",
@@ -251,9 +256,13 @@
                         },
                         "additionalProperties": false,
                         "required": ["header", "footer"]
+                    },
+                    "items": {
+                        "type": "array"
                     }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": ["size", "canEdit"] // , "items"
             }
         };
     </script>

@@ -7,13 +7,16 @@ class JsonSchemaValidator {
             date: /^\d{4}-\d{2}-\d{2}$/,
             time: /^\d{2}:\d{2}(:\d{2})?$/,
             'datetime-local': /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/,
-            color: /^#[0-9A-Fa-f]{6}$/,
+            color: /^#([0-9a-f]{6}|[0-9a-f]{3})$/i,
             email: /^[^\s@]+@[^\s@]+\.[a-z0-9]{2,10}$/
         };
     }
 
     validate(json, schema = null, path = '') {
         if (!schema) {
+            if (!this.schema) {
+                return [];
+            }
             schema = this.schema;
         }
         const errors = [];
@@ -36,8 +39,8 @@ class JsonSchemaValidator {
         if (schema.properties) {
             for (const key in json) {
                 if (!(key in schema.properties) && schema.additionalProperties === false) {
-                errors.push(`${path}${path ? '.' : ''}${key}: campo não permitido`);
-                continue;
+                    errors.push(`${path}${path ? '.' : ''}${key}: campo não permitido`);
+                    continue;
                 }
                 if (key in schema.properties) {
                     const propSchema = schema.properties[key];
@@ -107,60 +110,10 @@ class JsonSchemaValidator {
 
         return errors;
     }
-    
-    static generateFromSchema(schema) {
-        // Função auxiliar para escolher valor padrão com base no tipo
-        function getDefaultValue(type, schema) {
-            if (schema.enum) {
-                // Usa o primeiro valor do enum, se disponível
-                return schema.enum[0] || null;
-            }
-            switch (type) {
-                case 'string':
-                    return schema.minLength > 0 ? 'placeholder' : '';
-                case 'number':
-                case 'integer':
-                    return 0;
-                case 'boolean':
-                    return true;
-                case 'array':
-                    return [];
-                case 'object':
-                    return {};
-                default:
-                    return null;
-            }
-        }
-    
-        // Lida com objetos
-        if (schema.type === 'object') {
-            const result = {};
-            const properties = schema.properties || {};
-            const required = schema.required || [];
-    
-            for (const key in properties) {
-                const propSchema = properties[key];
-                // Inclui apenas se é requerido ou para preencher boilerplate
-                if (required.includes(key) || true) {
-                    result[key] = this.generateFromSchema(propSchema);
-                }
-            }
-            return result;
-        }
-    
-        // Lida com arrays
-        if (schema.type === 'array') {
-            const itemsSchema = schema.items || {};
-            // Retorna array vazio ou com um item inicial (ajustável)
-            return [this.generateFromSchema(itemsSchema)];
-        }
-    
-        // Lida com tipos primitivos
-        return getDefaultValue(schema.type, schema);
-    }
 
     validateType(value, type) {
         if (type === 'null') return value === null;
+        if (type === 'number') return typeof value === 'number' && !isNaN(value);
         if (type === 'array') return Array.isArray(value);
         if (type === 'object') return typeof value === 'object' && value !== null && !Array.isArray(value);
         return typeof value === type;
@@ -172,12 +125,13 @@ class JsonSchemaValidator {
     }
 
     validateUniqueItems(array) {
-        for (let i = 0; i < array.length; i++) {
-            for (let j = i + 1; j < array.length; j++) {
-                if (this.deepEqual(array[i], array[j])) {
-                    return false;
-                }
+        const seen = new Set();
+        for (const item of array) {
+            const key = JSON.stringify(item);
+            if (seen.has(key)) {
+                return false;
             }
+            seen.add(key);
         }
         return true;
     }

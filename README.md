@@ -88,23 +88,28 @@ EditJSON provides simple ways to change behavior and appearance.
 
 ### Disable Controls
 
-You can disable the ability to insert, move or remove items, separatedly. Besides that, you can block the edition of object keys.
+You can globally disable the ability to insert, move or remove items, separatedly. Besides that, you can block the edition of object keys.
 
 ```js
-EditJSON.canInsertItems = false; // Disables the insertion of new items in arrays/objects
-EditJSON.canMoveItems = false; // Locks item positions in arrays/objects
-EditJSON.canEditKeys = false; // Prevents modification of object property names
-EditJSON.canRemoveItems = false;  // Removes item deletion capabilities
+const editor =  new  EditJSON(document.getElementById('json-textarea')); 
+// Do this before call openEditor()
+const insertItems = false; // Disables the insertion of new items in arrays/objects
+const moveItems = false; // Locks item positions in arrays/objects
+const editKeys = false; // Prevents modification of object property names
+const removeItems = false;  // Removes item deletion capabilities
+editor.setConfig({ insertItems, moveItems, editKeys, removeItems });
 ```
 
 This disables the up/down arrows and remove buttons from the editor UI.
 
 ### Change Texts or Icons
 
-All interface labels and icons are stored in `EditJSON.strings`. You can replace them using the `setStrings()` method.
+All interface labels and icons are stored in `Strings` object. You can replace them using the `Strings.set()` static method. You'll need to import `Strings` as well.
 
 ```js
-EditJSON.setStrings({
+import EditJSON, { Strings } from 'edit-json';
+
+Strings.set({
     popupTitle: 'Editar JSON',
     popupOkButtonLabel: 'Salvar',
     popupCancelButtonLabel: 'Cancelar',
@@ -115,13 +120,79 @@ EditJSON.setStrings({
 ```
 Place this before calling `EditJSON.apply()` — or directly inside `apply-edit-json.js` if you're using the default loader.
 
-This also allows you to:
+This also allows you to tanslate all UI strings and replace Font Awesome icons with emojis, plain text, or your own HTML.
 
--   Translate all UI strings
--   Replace Font Awesome icons with emojis, plain text, or your own HTML
--   Simplify the UI by removing icons (e.g. `removeIcon: ''`)
+No need for Font Awesome unless you want to use it. All visual elements (including the Font Awesome icons) are fully customizable via strings. To do this you must replace all icons (`lockIcon`, `moveUpIcon`, `moveDownIcon`, `removeIcon`, `collapseItemIcon` e `expandItemIcon`).
 
-No need for Font Awesome unless you want to use it. All visual elements (including the Font Awesome icons) are fully customizable via strings. To do this you must replace all icons (`moveUpIcon`, `moveDownIcon`, `removeIcon`, `collapseItemIcon` e `expandItemIcon`).
+## JSON Schema Support
+
+EditJSON provides built-in JSON Schema integration to validate and guide JSON editing. When a schema is specified:
+
+### Key Features
+
+**Automatic Structure Generation**  
+- Creates valid initial JSON structure when the input field is empty  
+- Populates default values for fields defined in the schema  
+
+**Visual Validation**  
+- Required fields (`required`) are non-removable  
+- Schema-compliant input controls:  
+  - `boolean`: True/False dropdown  
+  - `date`/`date-time`/`time`: Native date pickers  
+  - `color`: Color selector  
+  - `enum`: Predefined value dropdown  
+
+**Editing Restrictions**  
+- Automatically disables actions when:  
+  - Array reaches `minItems`/`maxItems` limits  
+  - Object has `additionalProperties: false`  
+- 🔒 Icon indicates schema-enforced fields  
+
+**Schema Transparency**  
+- View full schema via lock icon  
+- Field descriptions appear as helper text  
+
+### Implementation Example
+
+1. **Register Schema Globally** (before loading EditJSON):
+```javascript
+window.EditJSONSchemas = {
+    metadata: {  // Schema identifier
+        "type": "object",
+        "properties": {
+            "size": {
+                "type": "string",
+                "enum": ["small", "medium", "large"],
+                "description": "Controls widget display dimensions"
+            },
+            "color": {
+                "type": "string",
+                "format": "color",
+                "description": "Primary color (hex/rgb/rgba)"
+            }
+        }
+    }
+};
+```
+
+2. **Attach to HTML Element**:
+```html
+<!-- data-schema="metadata" Matches schema key -->
+<textarea 
+    id="config-editor"
+    data-json-editor
+    data-schema="metadata"
+></textarea>
+<!-- If there is a schema, the initial structure is auto-created -->
+```
+
+### Current Limitations
+
+- Schema references (`$ref`) not resolved  
+- No real-time format validation (`pattern`, `format`)  
+- Limited support for composite schemas (`oneOf`/`anyOf`)  
+
+> **Pro Tip**: Use `"additionalProperties": false` to enforce strict structure compliance.
 
 ## Screenshots
 The editor
@@ -141,4 +212,15 @@ Duplicated object key
 
 ## License
 
-MIT — © Cau Guanabara
+MIT © Cau Guanabara
+
+### License Terms
+
+This project is open source under a **Modified MIT License**
+
+-  Free to use, modify, and distribute
+-  Commercial use permitted
+-  Credit me if you use this!  
+
+--------
+> EditJSON by Cau Guanabara (github.com/caugbr)  
