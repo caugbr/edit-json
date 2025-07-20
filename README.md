@@ -25,6 +25,34 @@ This loader script will:
 -   Load the required CSS (`edit-json.css`, `popup.css`)
 -   Attach the editor to all elements with `data-json-editor`
 
+### Basic Example
+
+```html
+<textarea data-json-editor rows="6" cols="60">
+{
+    "active": true,
+    "tags": ["example", "demo"]
+}
+</textarea>
+```
+
+### Trigger Another Element
+
+You can use a separate trigger (like a button) and target the JSON field using `data-target-selector`.
+
+```html
+<textarea id="myJson" readonly rows="6" cols="60">
+{
+    "title": "My config",
+    "enabled": false
+}
+</textarea>
+
+<button data-json-editor data-target-selector="#myJson">Edit JSON</button>
+```
+
+The button will open the popup editor for the `<textarea>`, even though it’s read-only.
+
 ### Manual Initialization
 
 For custom implementation:
@@ -53,34 +81,6 @@ For custom implementation:
     });
 </script>
 ```
-
-### Basic Example
-
-```html
-<textarea data-json-editor rows="6" cols="60">
-{
-    "active": true,
-    "tags": ["example", "demo"]
-}
-</textarea>
-```
-
-### Trigger Another Element
-
-You can use a separate trigger (like a button) and target the JSON field using `data-target-selector`.
-
-```html
-<textarea id="myJson" readonly rows="6" cols="60">
-{
-    "title": "My config",
-    "enabled": false
-}
-</textarea>
-
-<button data-json-editor data-target-selector="#myJson">Edit JSON</button>
-```
-
-The button will open the popup editor for the `<textarea>`, even though it’s read-only.
 
 ## Customization
 
@@ -195,19 +195,19 @@ window.EditJSONSchemas = {
 > **Pro Tip**: Use `"additionalProperties": false` to enforce strict structure compliance.
 
 ## Screenshots
-The editor
+The editor\
 ![The editor](./screenshots/json-editor.png)
 
-Item action links
+Item action links\
 ![Item action links](./screenshots/json-editor-actions.png)
 
-Editing a boolean value
+Editing a boolean value\
 ![Editing a boolean value](./screenshots/json-editor-boolean.png)
 
-Editing a string in date format
+Editing a string in date format\
 ![Editing a string in date format](./screenshots/json-editor-date.png)
 
-Duplicated object key
+Duplicated object key\
 ![Duplicated object key](./screenshots/json-editor-invalid.png)
 
 ## License
