@@ -223,11 +223,17 @@ class EditorUI {
 
     verifyErrors() {
         this.displayErrors();
+        if (this.config.blockIfInvalid) {
+            $single('.footer-buttons button.save-json').removeAttribute('disabled');
+        }
         if (null !== this.jSchema.schema) {
             const json = this.extractFromHtml();
             const errors = this.jSchema.validateJson(json);
             if (errors.length) {
                 this.displayErrors(errors);
+                if (this.config.blockIfInvalid) {
+                    $single('.footer-buttons button.save-json').setAttribute('disabled', true);
+                }
             }
         }
     }

@@ -53,7 +53,9 @@ class EditJSON {
         /** @type {Boolean} Can user edit object keys? */
         editKeys: true,
         /** @type {Boolean} Let user see JSON Schema? */
-        visibleSchema: true
+        visibleSchema: true,
+        /** @type {Boolean} Let save JSON if is invalid against the schema? */
+        blockIfInvalid: true
     };
 
     /** @type {Object} Local configuration values */

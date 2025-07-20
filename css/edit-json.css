@@ -508,3 +508,8 @@ a.disabled {
     border: 1px solid var(--popup-button-bg);
     padding: 0.3rem 1rem;
 }
+
+.popup-overlay .popup-popup footer .footer-buttons button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
