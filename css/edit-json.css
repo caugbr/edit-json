@@ -5,7 +5,7 @@
     --font-size: 16px;
     --danger-color: #a52a2a;
     --action-color: #666666;
-    --invalid-color: #f6a3b9;
+    --invalid-color: #ffe3e3;
     --line-height: 1.8;
     --line-height-input: 1.2rem;
     --input-padding: 2px 4px;
@@ -131,6 +131,12 @@ a.disabled {
 /* Invalid key styling */
 .edit-json .edit-key.invalid {
     background-color: var(--invalid-color);
+}
+
+/* Invalid element styling */
+.edit-json .edit-line.invalid .edit-value {
+    background-color: var(--invalid-color);
+    border-radius: 6px;
 }
 
 /* Hover and focus for inputs */

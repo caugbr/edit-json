@@ -130,8 +130,20 @@
             font-size: 13px;
             color: #7f8c8d;
         }
+        .schema-link::after {
+            content: attr(data-ok);
+        }
+        textarea[data-invalid] + .schema-link::after {
+            content: attr(data-invalid);
+        }
         .schema-link i {
             margin-right: 5px;
+        }
+        textarea[data-invalid] {
+            background-color: #ffe3e3;;
+        }
+        textarea[data-invalid] + .schema-link {
+            color: #a52a2a;
         }
     </style>
 </head>
@@ -185,8 +197,8 @@
                 data-title="Edit Widget Configuration"
                 placeholder="Click to edit JSON"
             ></textarea>
-            <a class="schema-link" title="View field structure requirements">
-                <i class="fas fa-lock"></i> This field follows a specific schema
+            <a class="schema-link" data-ok="This field follows a specific schema" data-invalid="The current structure does not match the schema!">
+                <i class="fas fa-lock"></i> 
             </a>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import { rootEvent, tag, $single, debounce, rgbToHex } from "./util.js";
+import { rootEvent, tag, $single, $apply, debounce, rgbToHex } from "./util.js";
 import Popup from './popup.js';
 import Strings from "./strings.js";
 
@@ -197,11 +197,17 @@ class EditorUI {
         cancelButton.addEventListener('click', () => this.popup.close());
         okButton.addEventListener('click', async () => {
             const json = this.extractFromHtml();
+            let errors = [];
             if (null !== this.jSchema.schema) {
-                const errors = this.jSchema.validateJson(json);
+                errors = this.jSchema.validateJson(json);
                 if (errors.length) this.displayErrors(errors);
             }
             this.jsonElement.value = JSON.stringify(json, null, 4);
+            if (errors.length) {
+                this.jsonElement.setAttribute('data-invalid', '1');
+            } else {
+                this.jsonElement.removeAttribute('data-invalid');
+            }
             this.popup.close();
         });
         this.popup.addFooterButton(cancelButton);
@@ -229,11 +235,13 @@ class EditorUI {
     displayErrors(errors = []) {
         const elem = $single('.edit-json > .errors');
         elem.innerHTML = '';
+        $apply('.edit-json .edit-line.invalid', e => e.classList.remove('invalid'));
         errors.forEach(err => {
             const parts = err.split(': ');
             const item = `<span class="path">${parts[0]}</span> <span class="msg">${parts[1]}</span>`;
             const line = tag('div', { class:'error-line' }, item);
             elem.appendChild(line);
+            $single(`.edit-line[data-path="${parts[0]}"]`).classList.add('invalid');
         });
     }
     
