@@ -178,3 +178,16 @@ export function debounce(func, wait = 300, immediate = false) {
     if (callNow) func.apply(context, args);
   };
 }
+
+export function rgbToHex(rgbStr) {
+    const match = rgbStr.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i);
+    if (!match) return rgbStr;
+
+    const hexParts = match.slice(1, 4).map(value => {
+        const int = parseInt(value, 10);
+        if (int < 0 || int > 255) throw new Error(`Valor RGB inválido: ${int}. Deve ser entre 0 e 255.`);
+        return int.toString(16).padStart(2, '0'); // Garante 2 dígitos
+    });
+
+    return `#${hexParts.join('')}`;
+}

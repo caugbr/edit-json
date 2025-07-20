@@ -1,4 +1,4 @@
-import { rootEvent, tag, $single, debounce } from "./util.js";
+import { rootEvent, tag, $single, debounce, rgbToHex } from "./util.js";
 import Popup from './popup.js';
 import Strings from "./strings.js";
 
@@ -272,7 +272,7 @@ class EditorUI {
      * @returns {HTMLElement} DIV element containing the editable field
      */
     editField(key, val) {
-        this.jSchema.pushPath(key); // Acrescenta chave ao path
+        this.jSchema.pushPath(key);
         const schema = this.jSchema.getSchemaForPath(this.jSchema.getCurrentPath()) || null;
         const contenteditable = schema ? false : this.config.editKeys;
         const keyText = tag('span', { contenteditable, spellcheck: false, class: 'edit-key' }, key);
@@ -297,9 +297,9 @@ class EditorUI {
                 valText = this.valHtml(val, true, this.jSchema.getCurrentPath());
         }
         const attrs = { class: 'edit-line', 'data-path': this.jSchema.getCurrentPath() };
-        this.jSchema.popPath(); // Decresce path
+        this.jSchema.popPath();
         let desc = '';
-        if (schema.description) {
+        if (schema && schema.description) {
             desc = tag('span', { class: 'description' }, schema.description);
         }
         return tag('div', attrs, [ keyText, ": ", valText, desc ]);
@@ -427,7 +427,7 @@ class EditorUI {
         const line = tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
         txt.addEventListener('focus', () => line.classList.add('focused'));
         txt.addEventListener('blur', () => line.classList.remove('focused'));
-        txt.addEventListener('input', () => inp.value = txt.innerText.trim());
+        txt.addEventListener('input', () => inp.value = rgbToHex(txt.innerText.trim()));
         inp.addEventListener('focus', () => line.classList.add('focused'));
         inp.addEventListener('blur', () => line.classList.remove('focused'));
         inp.addEventListener('input', () => txt.innerText = inp.value.trim());
