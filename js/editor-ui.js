@@ -1,10 +1,13 @@
-import { rootEvent, tag, $single,  } from "./util.js";
+import { rootEvent, tag, $single, debounce } from "./util.js";
 import Popup from './popup.js';
 import Strings from "./strings.js";
 
 class EditorUI {
     /** @type {string} Unique editor identifier */
     id = '';
+
+    /** @type {string} Title for editor popup */
+    popupTitle = '';
 
     /** @type {string} Original JSON text */
     jsonText = '';
@@ -27,6 +30,7 @@ class EditorUI {
     /** @type {Object} Local configuration values */
     config = null;
 
+    /** @type {Object} EditJSON class (only static methods) */
     ej = null;
 
     constructor(jsonElement = null, jSchema = null, config = null, staticEJ = null) {
@@ -83,6 +87,9 @@ class EditorUI {
         this.jsonElement = jsonElement;
         this.id = jsonElement.id || jsonElement.name || Strings.get('unnamed');
         this.jsonText = jsonElement.value.trim();
+        if (this.jsonElement.dataset.title ?? false) {
+            this.popupTitle = this.jsonElement.dataset.title;
+        }
         
         try {
             this.jsonData = JSON.parse(this.jsonText);
@@ -144,6 +151,7 @@ class EditorUI {
             elem = this.editObject(this.jsonData);
         }
 
+        this.htmlElement.appendChild(tag('div', { class: 'errors' }));
         this.htmlElement.appendChild(elem);
         this.showSchemaLink();
     }
@@ -178,7 +186,11 @@ class EditorUI {
         if (this.htmlElement.innerHTML.trim() === '') {
             this.edit();
         }
-        this.popup = new Popup(Strings.get('popupTitle'), this.htmlElement);
+        const title = this.popupTitle || Strings.get('popupTitle');
+        this.popup = new Popup(title, this.htmlElement);
+        this.popup.iconClose = Strings.get('popupClose', 'icon');
+        this.popup.iconMaximize = Strings.get('popupMaximize', 'icon');
+        this.popup.iconRestore = Strings.get('popupRestore', 'icon');
         this.htmlElement.style.display = 'block';
         const cancelButton = tag('button', { type: 'button', class: 'close-popup secondary' }, Strings.get('popupCancelButtonLabel'));
         const okButton = tag('button', { type: 'button', class: 'save-json' }, Strings.get('popupOkButtonLabel'));
@@ -187,15 +199,42 @@ class EditorUI {
             const json = this.extractFromHtml();
             if (null !== this.jSchema.schema) {
                 const errors = this.jSchema.validateJson(json);
-                console.log('errors', errors); // o que fazer com isso?
+                if (errors.length) this.displayErrors(errors);
             }
             this.jsonElement.value = JSON.stringify(json, null, 4);
             this.popup.close();
         });
         this.popup.addFooterButton(cancelButton);
         this.popup.addFooterButton(okButton);
+        this.popup.on('open', () => {
+            if (null !== this.jSchema.schema) {
+                setTimeout(() => this.verifyErrors(), 500);
+            }
+        });
         this.popup.open();
         setTimeout(() => this.jSchema.applyRequiredClass(), 120);
+    }
+
+    verifyErrors() {
+        this.displayErrors();
+        if (null !== this.jSchema.schema) {
+            const json = this.extractFromHtml();
+            const errors = this.jSchema.validateJson(json);
+            if (errors.length) {
+                this.displayErrors(errors);
+            }
+        }
+    }
+
+    displayErrors(errors = []) {
+        const elem = $single('.edit-json > .errors');
+        elem.innerHTML = '';
+        errors.forEach(err => {
+            const parts = err.split(': ');
+            const item = `<span class="path">${parts[0]}</span> <span class="msg">${parts[1]}</span>`;
+            const line = tag('div', { class:'error-line' }, item);
+            elem.appendChild(line);
+        });
     }
     
     /**
@@ -336,15 +375,55 @@ class EditorUI {
         if (path) {
             attrs['data-path'] = path;
         }
+        this.applyOnInput(valText);
         if (actions) {
             return tag('span', attrs, [valText, this.makeActions()]);
         }
         return tag('span', attrs, valText);
     }
 
+    applyOnInput(elem) {
+        this.debouncedOnInput = debounce(this.onInput.bind(this), 500);
+        if (elem.matches('.edit-value-date,.edit-value-color')) {
+            const span = $single('span[contenteditable="true"]', elem);
+            const input = $single('input', elem);
+            span.addEventListener('input', (event) => this.debouncedOnInput(event.target));
+            input.addEventListener('input', (event) => this.debouncedOnInput(event.target));
+        }
+        if (elem.matches('select.edit-value[id^="enum_"],select.edit-value,span.edit-value[contenteditable="true"],input')) {
+            elem.addEventListener('input', (event) => this.debouncedOnInput(event.target));
+        } else if (elem.matches('span.edit-value')) {
+            const span = $single('span[contenteditable="true"]', elem);
+            span.addEventListener('input', (event) => this.debouncedOnInput(event.target));
+        }
+    }
+
+    onInput() {
+        this.verifyErrors();
+    }
+
+    /**
+     * Creates a bidirectional input control (editable span + input)
+     * @param {string} type - Input type (here is only 'date' or 'color')
+     * @param {string} value - Initial value
+     * @returns {HTMLElement} Container element
+     */
     bidirectTextInput(type, value) {
+        if (!value && type == 'color') {
+            value = '#000000';
+        }
+        if (!value && type == 'date') {
+            value = (new Date()).toISOString().split('T')[0];
+        }
+        if (!value && type == 'datetime-local') {
+            const now = new Date().getTime() - new Date().getTimezoneOffset() * 60000;
+            value = (new Date(now)).toISOString().slice(0, 16);
+        }
+        if (!value && type == 'time') {
+            value = (new Date()).toTimeString().substring(0, 5);
+        }
         const txt = tag('span', { contenteditable: true, class: 'edit-value' }, value);
-        const inp = tag('input', { type, value, class: `edit-value-${type}-input` });
+        const inp = tag('input', { type, value, class: `edit-value-${type}-input`, novalidate: '' });
         const line = tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
         txt.addEventListener('focus', () => line.classList.add('focused'));
         txt.addEventListener('blur', () => line.classList.remove('focused'));
@@ -665,7 +744,7 @@ class EditorUI {
      * @returns {Object|Array} Parsed JSON structure
      */
     extractFromHtml() {
-        const root = $single('.popup-popup .edit-json > :first-child');
+        const root = $single('.popup-popup .edit-json > :nth-child(2)');
         function parseNode(node) {
             if (node.classList.contains('edit-object-wrapper')) {
                 const elem = node.querySelector('.edit-object');

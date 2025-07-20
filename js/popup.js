@@ -58,6 +58,9 @@ class Popup {
     footer = true;
     footerChildren = [];
     stage = null;
+    iconClose = '<i class="fas fa-times"></i>';
+    iconMaximize = '<i class="fas fa-window-maximize"></i>';
+    iconRestore = '<i class="fas fa-window-restore"></i>';
 
     constructor(title = '', content = '') {
         this.title = title;
@@ -127,13 +130,13 @@ class Popup {
             header.appendChild(topBar);
 
             if (this.useMaxMinButton) {
-                const maximize = tag('a', { href: '#', class: 'maximize-popup' }, '<i class="fas fa-window-maximize"></i>');
+                const maximize = tag('a', { href: '#', class: 'maximize-popup' }, this.iconMaximize);
                 header.appendChild(maximize);
                 maximize.addEventListener('click', event => {
                     event.preventDefault();
                     this.maximize();
                 });
-                const minimize = tag('a', { href: '#', class: 'minimize-popup' }, '<i class="fas fa-window-restore"></i>');
+                const minimize = tag('a', { href: '#', class: 'minimize-popup' }, this.iconRestore);
                 header.appendChild(minimize);
                 minimize.addEventListener('click', event => {
                     event.preventDefault();
@@ -142,7 +145,7 @@ class Popup {
             }
 
             if (this.useCloseButton) {
-                const close = tag('a', { href: '#', class: 'close-popup' }, '<i class="fas fa-times"></i>');
+                const close = tag('a', { href: '#', class: 'close-popup' }, this.iconClose);
                 header.appendChild(close);
                 close.addEventListener('click', event => {
                     event.preventDefault();

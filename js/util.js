@@ -156,3 +156,25 @@ export function loadCss(cssPaths) {
 export function isAsyncFunction(fn) {
     return fn?.constructor?.name === 'AsyncFunction' || fn instanceof Promise;
 }
+
+/**
+ * @param {Function} func - Função a ser executada após o delay
+ * @param {number} wait - Tempo de espera em milissegundos
+ * @param {boolean} immediate - Executar imediatamente na primeira chamada?
+ * @returns {Function} Versão debounced da função
+ */
+export function debounce(func, wait = 300, immediate = false) {
+  let timeout;
+  return function() {
+    const context = this;
+    const args = arguments;
+    const later = () => {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    const callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}

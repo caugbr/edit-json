@@ -71,6 +71,7 @@ class EditJSON {
      * @param {HTMLElement|null} jsonElement - JSON input/output element
      */
     constructor(jsonElement = null, schema = null, config = null) {
+        Strings.init();
 
         this.jSchema = new JsonSchema();
         

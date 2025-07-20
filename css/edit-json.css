@@ -71,6 +71,44 @@ a.disabled {
     opacity: 1;
 }
 
+/* === Errors === */
+.edit-json > .errors {
+    width: calc(100% - 24px);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid #ffc7c7;
+    background-color: #ffe3e3;
+    color: #a52a2a;
+    margin: -10px auto 10px 0;
+}
+.edit-json > .errors:empty {
+    padding: 0;
+    border-width: 0;
+}
+.edit-json > .errors .error-line {
+    margin: 0.2rem auto;
+}
+.edit-json > .errors .error-line::before {
+    /* content: '•'; */
+    content: '→';
+    padding-right: 0.5rem;
+}
+.edit-json > .errors .error-line .path {
+    font-weight: 700;
+    padding-right: 0.5rem;
+}
+.edit-json > .errors .error-line .msg {
+    font-style: italic;
+}
+.edit-json > .errors .error-line code {
+    font-style: normal;
+    font-size: 1.2em;
+    background-color: #e9e9e9;
+    padding: 2px 4px;
+    color: #333;
+    border-radius: 4px;
+}
+
 /* === Input Fields (Keys, Values, and Add Item) === */
 /* Styling for editable keys, values, and number inputs */
 .edit-json .edit-key,
@@ -353,10 +391,10 @@ a.disabled {
 }
 
 /* Hide actions in root */
-.edit-json > .edit-array-wrapper:first-child > .edit-array > .actions,
-.edit-json > .edit-object-wrapper:first-child > .edit-object > .actions,
-.edit-json > .edit-array-wrapper:first-child > a.toggle,
-.edit-json > .edit-object-wrapper:first-child > a.toggle {
+.edit-json > .edit-array-wrapper:nth-child(2) > .edit-array > .actions,
+.edit-json > .edit-object-wrapper:nth-child(2) > .edit-object > .actions,
+.edit-json > .edit-array-wrapper:nth-child(2) > a.toggle,
+.edit-json > .edit-object-wrapper:nth-child(2) > a.toggle {
     display: none;
 }
 
