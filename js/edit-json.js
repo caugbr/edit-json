@@ -1,16 +1,20 @@
+/**
+ * EditJSON
+ * --------
+ * A safe JSON editor for HTML form fields
+ * 
+ * By Cau Guanabara (https://github.com/caugbr)
+ * Released in 2025-07-20
+ * 
+ * This project in GitHub: https://github.com/caugbr/edit-json
+ */
+
 // import '../css/edit-json.css';
 import Popup from './popup.js';
 import Strings from './strings.js';
 import JsonSchema from './json-schema.js';
 import EditorUI from './editor-ui.js';
-import { 
-    $single, 
-    $apply, 
-    tag, 
-    isPlainObject, 
-    rootEvent, 
-    copyObject 
-} from './util.js';
+import { $apply, isPlainObject, copyObject } from './util.js';
 
 /**
  * Class for interactive and safe JSON edition
@@ -55,7 +59,7 @@ class EditJSON {
         /** @type {Boolean} Let user see JSON Schema? */
         visibleSchema: true,
         /** @type {Boolean} Let save JSON if is invalid against the schema? */
-        blockIfInvalid: true
+        blockIfInvalid: false
     };
 
     /** @type {Object} Local configuration values */

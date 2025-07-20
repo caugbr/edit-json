@@ -149,9 +149,7 @@
 </head>
 <body>
     <header class="ej-header">
-        <div class="ej-logo">
-            <img src="edit-json.png" alt="EditJSON">EditJSON
-        </div>
+        <div class="ej-logo">EditJSON</div>
         <div class="tagline">A Safe JSON Editor for Form Fields</div>
     </header>
 
@@ -182,6 +180,8 @@
             </div>
         </div>
     </section>
+
+    <h2>Examples</h2>
 
     <div class="example">
         <h2>Clickable Textarea</h2>
@@ -271,7 +271,8 @@
                         "required": ["header", "footer"]
                     },
                     "items": {
-                        "type": "array"
+                        "type": "array",
+                        "maxItems": 2
                     }
                 },
                 "additionalProperties": false,

@@ -737,6 +737,7 @@ class EditorUI {
         div.parentElement.insertBefore(item, div);
         select.value = '';
         this.enableAddButton(select);
+        this.verifyErrors();
     }
 
     /**
@@ -751,6 +752,7 @@ class EditorUI {
         if (confirmed) {
             elem.closest('.edit-object > .edit-line, .edit-array > .input-wrapper')?.remove();
         }
+        this.verifyErrors();
     }
 
     /**
