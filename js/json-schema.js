@@ -143,7 +143,7 @@ class JsonSchema {
                 return schema.enum[0] || null;
             }
             switch (type) {
-                case 'string': return schema.minLength > 0 ? 'placeholder' : '';
+                case 'string': return ''; // schema.minLength > 0 ? 'placeholder' : '';
                 case 'number': case 'integer': return 0;
                 case 'boolean': return true;
                 case 'array': return [];

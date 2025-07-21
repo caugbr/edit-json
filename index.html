@@ -258,7 +258,12 @@
                     "day": {
                         "type": "string",
                         "format": "date",
-                        "description": "Date of your day"
+                        "description": "Date of your favorite day"
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 5
                     },
                     "canEdit": {
                         "type": "object",
@@ -268,11 +273,14 @@
                             "content": { "type": "boolean" }
                         },
                         "additionalProperties": false,
+                        "description": "Beautiful object",
                         "required": ["header", "footer"]
                     },
                     "items": {
                         "type": "array",
-                        "maxItems": 2
+                        "minItems": 1,
+                        "maxItems": 2,
+                        "description": "An arbitrary array"
                     }
                 },
                 "additionalProperties": false,

@@ -300,17 +300,21 @@ class EditorUI {
         keyText.addEventListener('input', cb);
         keyText.addEventListener('input', cb);
         let valText;
+        let clsType = '';
         switch (this.ej.getType(val)) {
             case 'array':
                 valText = this.editArray(val);
+                clsType = ' array';
                 break;
             case 'object':
                 valText = this.editObject(val);
+                clsType = ' object';
                 break;
             default:
                 valText = this.valHtml(val, true, this.jSchema.getCurrentPath());
+                clsType = ' scalar';
         }
-        const attrs = { class: 'edit-line', 'data-path': this.jSchema.getCurrentPath() };
+        const attrs = { class: 'edit-line' + clsType, 'data-path': this.jSchema.getCurrentPath() };
         this.jSchema.popPath();
         let desc = '';
         if (schema && schema.description) {

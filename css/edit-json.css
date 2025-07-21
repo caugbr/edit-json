@@ -37,6 +37,25 @@ a.disabled {
 }
 
 /* === Layout and Indentation === */
+
+.edit-json .edit-line.scalar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: 1.8em;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.edit-json .input-wrapper {
+    white-space: nowrap;
+}
+
+.edit-object-wrapper.collapsed + .description,
+.edit-array-wrapper.collapsed + .description {
+    margin-left: 5em !important;
+}
+
 /* Indentation for edit lines and array inputs */
 .edit-json .edit-line,
 .edit-json .edit-array > .input-wrapper {
@@ -51,6 +70,7 @@ a.disabled {
     font-size: 0.8em;
     opacity: 0;
     transition: opacity 200ms ease;
+    line-height: 1.2;
 }
 
 /* Indentation and styling for add new item row */
@@ -88,14 +108,17 @@ a.disabled {
 .edit-json > .errors .error-line {
     margin: 0.2rem auto;
 }
-.edit-json > .errors .error-line::before {
-    /* content: '•'; */
-    content: '→';
+/* .edit-json > .errors .error-line::before {
     padding-right: 0.5rem;
-}
+} */
 .edit-json > .errors .error-line .path {
     font-weight: 700;
     padding-right: 0.5rem;
+}
+.edit-json > .errors .error-line .path::after {
+    content: '→';
+    padding-left: 0.5rem;
+    font-weight: normal;
 }
 .edit-json > .errors .error-line .msg {
     font-style: italic;
@@ -500,6 +523,8 @@ a.disabled {
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
     background-color: var(--popup-button-primary-bg);
     color: var(--popup-button-primary-color);
+    font-weight: 400;
+    font-size: 15px;
 }
 
 .popup-overlay .popup-popup .footer-buttons button.secondary {
