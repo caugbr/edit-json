@@ -57,9 +57,11 @@ class EditJSON {
         /** @type {Boolean} Can user edit object keys? */
         editKeys: true,
         /** @type {Boolean} Let user see JSON Schema? */
-        visibleSchema: true,
+        viewSchema: true,
+        /** @type {Boolean} Let user personalize interface? */
+        viewConfig: true,
         /** @type {Boolean} Let save JSON if is invalid against the schema? */
-        blockIfInvalid: false
+        blockIfInvalid: true
     };
 
     /** @type {Object} Local configuration values */
@@ -77,7 +79,7 @@ class EditJSON {
      * @param {HTMLElement|null} jsonElement - JSON input/output element
      */
     constructor(jsonElement = null, schema = null, config = null) {
-        Strings.init();
+        // Strings.init();
 
         this.jSchema = new JsonSchema();
         

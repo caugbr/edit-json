@@ -1,5 +1,8 @@
-import { rootEvent, tag, $single, $apply, debounce, rgbToHex } from "./util.js";
+import { rootEvent, tag, $single, $apply, debounce, rgbToHex, camelToNormal } from "./util.js";
 import Popup from './popup.js';
+// import DesignTokens from "./design-tokens.js";
+// import tokens from '../layout/editor.js';
+import LayoutEditor from './layout-editor.js';
 import Strings from "./strings.js";
 
 class EditorUI {
@@ -138,7 +141,7 @@ class EditorUI {
      * Starts JSON editing
      * @returns {boolean} False if no data to edit
      */
-    edit() {
+    async edit() {
         if (!this.jsonElement) {
             console.error(Strings.get('jsonNotSet', 'error'));
             return false;
@@ -153,7 +156,15 @@ class EditorUI {
 
         this.htmlElement.appendChild(tag('div', { class: 'errors' }));
         this.htmlElement.appendChild(elem);
+        await this.showConfigLink();
         this.showSchemaLink();
+    }
+
+    async showConfigLink() {
+        if (this.config.viewConfig) {
+            const le = await LayoutEditor.create(this.htmlElement, (en) => this.enableButtons(en));
+            le.showConfigLink();
+        }
     }
 
     showSchemaLink() {
@@ -163,12 +174,16 @@ class EditorUI {
                 { class: 'show-schema disabled', title: Strings.get('hasSchema') }, 
                 Strings.get('lockIcon', 'icon')
             );
-            if (this.config.visibleSchema) {
+            if (this.config.viewSchema) {
                 showSchema.title = Strings.get('viewSchema');
                 showSchema.classList.remove('disabled');
                 showSchema.addEventListener('click', () => {
+                    this.enableButtons(false);
                     const close = tag('a', { class: 'close-schema-overlay' }, Strings.get('closeIcon', 'icon'));
-                    close.addEventListener('click', () => overlay.remove());
+                    close.addEventListener('click', () => {
+                        this.enableButtons(true);
+                        overlay.remove();
+                    });
                     const wrap = tag('pre', { class: 'wrap-schema' }, JSON.stringify(this.jSchema.schema, null, 4));
                     const wrapper = tag('div', {}, [tag('h3', {}, Strings.get('viewSchemaTitle')), wrap]);
                     const overlay = tag('div', { class: 'schema-overlay' }, [close, wrapper]);
@@ -828,6 +843,27 @@ class EditorUI {
             return null;
         }
         return parseNode(root);
+    }
+        
+    /**
+     * Enables/disables the editor buttons
+     */
+    enableButtons(enable = true) {
+        $apply('.popup-popup .footer-buttons button', e => {
+            let en = enable;
+            if (enable) {
+                const attr = e.getAttribute('data-already-disabled');
+                if (attr) {
+                    en = false;
+                    e.removeAttribute('data-already-disabled');
+                }
+            } else {
+                if (e.disabled) {
+                    e.setAttribute('data-already-disabled', '1');
+                }
+            }
+            e.disabled = !en;
+        });
     }
 
 }

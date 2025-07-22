@@ -191,3 +191,50 @@ export function rgbToHex(rgbStr) {
 
     return `#${hexParts.join('')}`;
 }
+
+export function camelToNormal(text) {
+    const withSpaces = text.replace(/([A-Z])/g, ' $1').toLowerCase();
+    return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
+}
+
+export async function importJson(path) {
+    const response = await fetch(path);
+    if (!response.ok) {
+        throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    }
+    return await response.json();
+}
+
+export function relToAbs(relUrl) {
+    const urlBase = new URL(import.meta.url);
+    return new URL(relUrl, urlBase).href;
+}
+
+/**
+ * Checks if string represents a hex color
+ * @param {string} val - Value to test
+ * @returns {boolean} TRUE is is a color
+ */
+export function isColor(val) {
+    return /^(#([a-f0-9]{6}|[a-f0-9]{3})|rgb\(\s*\d{1,3},\s*\d{1,3},\s*\d{1,3}\s*\)|rgba\(\s*\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*(0|1|0\.\d+)\s*\))$/i.test(val.trim());
+}
+
+/**
+ * Checks if string represents a date/time
+ * @param {string} val - Value to test
+ * @returns {string|false} Date type ('date', 'datetime-local', 'time') or false
+ */
+export function isDateTime(val) {
+    if (typeof val === 'string') {
+        if (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(val)) {
+            return 'date';
+        }
+        if (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]$/.test(val)) {
+            return 'datetime-local';
+        }
+        if (/^([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/.test(val)) {
+            return 'time';
+        }
+    }
+    return false;
+}

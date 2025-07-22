@@ -19,6 +19,9 @@
     --popup-button-primary-color: #ffffff;
     --popup-button-bg: #d9d9d9;
     --popup-button-color: #333333;
+    --error-box-border-color: #ffc7c7;
+    --error-box-bg: #ffe3e3;
+    --error-box-color: #a52a2a;
 }
 
 /* === General Styles === */
@@ -65,12 +68,138 @@ a.disabled {
 
 .edit-json .edit-line .description {
     margin-left: 1rem;
-    color: #aaaaaa;
+    color: var(--description-color);
+    --description-color: #aaaaaa;
     font-style: italic;
     font-size: 0.8em;
     opacity: 0;
     transition: opacity 200ms ease;
     line-height: 1.2;
+}
+
+
+/* === Config tab === */
+ul.wrap-config {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+ul.wrap-config li {
+    line-height: 1.2em;
+    margin-bottom: 0.45rem;
+    list-style: none;
+}
+ul.wrap-config li label {
+    display: inline-block;
+    width: 50%;
+    text-align: right;
+    margin-right: 0.5rem;
+}
+
+.config-wrapper input[type="text"] {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 2px;
+    border-radius: 4px;
+    line-height: 1.4em;
+}
+
+input[type="color"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    outline: none;
+    width: 3em;
+    height: 1.7em;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-block !important;
+    box-shadow: none;
+    color: transparent;
+    /* border-radius: 6px; */
+    border: 1px solid #ccc;
+    vertical-align: middle;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+}
+
+.config-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0 !important;
+}
+
+.config-wrapper input[type="color"]::-webkit-color-swatch {
+    border: none !important;
+    /* border-radius: 6px; */
+    border-radius: var(--border-radius);
+}
+
+.config-wrapper input[type="color"]::-moz-color-swatch {
+    border: none !important;
+    /* border-radius: 6px; */
+    border-radius: var(--border-radius);
+}
+
+.size-field {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.size-field span[contenteditable="true"] {
+    width: auto;
+    display: inline-block;
+    min-width: 1.2em;
+    border: 0;
+    background-color: transparent;
+    text-align: right;
+}
+
+.size-field span[contenteditable="true"]:focus {
+    outline: none;
+}
+
+.size-field select {
+    width: 3.5em;
+    border: 0;
+    background-color: transparent;
+}
+
+.size-field select:focus,
+.size-field input:focus {
+    outline: 0px;
+}
+
+.config-wrapper input[type="text"]:focus,
+.size-field:has(:focus) {
+    outline: none;
+    border: 1px solid #666666;
+}
+
+.config-wrapper .buttons {
+    margin: 0.7rem auto 0.2rem;
+    text-align: center;
+}
+
+.config-wrapper .buttons button {
+    padding: 0.2rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--popup-button-bg);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
+    background-color: var(--popup-button-primary-bg);
+    color: var(--popup-button-primary-color);
+    font-weight: 400;
+    font-size: 15px;
+    margin: 0 0.25rem;
+}
+
+.config-wrapper .buttons button.secondary {
+    background-color: var(--popup-button-bg);
+    color: #333;
+    border: 1px solid var(--popup-button-bg);
 }
 
 /* Indentation and styling for add new item row */
@@ -96,9 +225,9 @@ a.disabled {
     width: calc(100% - 24px);
     padding: 8px 12px;
     border-radius: 12px;
-    border: 1px solid #ffc7c7;
-    background-color: #ffe3e3;
-    color: #a52a2a;
+    border: 1px solid var(--error-box-border-color);
+    background-color: var(--error-box-bg);
+    color: var(--error-box-color);
     margin: -10px auto 10px 0;
 }
 .edit-json > .errors:empty {
@@ -250,7 +379,7 @@ a.disabled {
     opacity: 0;
     position: absolute;
     clip-path: inset(0 100% 0 0);
-    margin-left: 1rem;
+    margin-left: 1rem !important;
     line-height: var(--line-height-input);
     font-family: var(--font-code);
     border-radius: var(--border-radius);
@@ -336,31 +465,28 @@ a.disabled {
 }
 
 /* Remove item button */
-.edit-json .edit-object > .edit-line.required .input-wrapper .remove-item,
-.edit-json .edit-object > .edit-line.required .edit-object .remove-item,
-.edit-json .edit-object > .edit-line.required .edit-array .remove-item {
+.edit-json .edit-line.object.required > .edit-object-wrapper > .edit-object > .actions .remove-item,
+.edit-json .edit-line.array.required > .edit-array-wrapper > .edit-array > .actions .remove-item,
+.edit-json .edit-line.scalar.required .remove-item  {
     display: none;
 }
-/* 
-.edit-json .show-schema {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-} */
 
+/* Schema */
+.edit-json .config-overlay,
 .edit-json .schema-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     background-color: #fff;
     color: #666666;
     padding: 0.75rem;
 }
 
+.edit-json .show-config,
 .edit-json .show-schema,
+.edit-json .close-config-overlay,
 .edit-json .close-schema-overlay {
     position: absolute;
     top: 10px;
@@ -368,7 +494,11 @@ a.disabled {
     cursor: pointer;
     color: #666666;
 }
+.edit-json .show-config + .show-schema {
+    top: 34px;
+}
 
+.edit-json .config-overlay h3,
 .edit-json .schema-overlay h3 {
     margin-top: 0;
 }
@@ -473,7 +603,7 @@ a.disabled {
 .popup-overlay .popup-popup {
     display: flex;
     flex-direction: column;
-    border: 1px solid #4C6699;
+    border: 1px solid var(--popup-header-bg);
 }
 
 /* Popup header */
@@ -519,18 +649,18 @@ a.disabled {
 .popup-overlay .popup-popup footer .footer-buttons button {
     padding: 0.4rem 1rem;
     border-radius: 8px;
-    border: 1px solid var(--popup-button-bg);
+    border: 1px solid var(--popup-button-bg) !important;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
-    background-color: var(--popup-button-primary-bg);
-    color: var(--popup-button-primary-color);
+    background-color: var(--popup-button-primary-bg) !important;
+    color: var(--popup-button-primary-color) !important;
     font-weight: 400;
     font-size: 15px;
 }
 
 .popup-overlay .popup-popup .footer-buttons button.secondary {
-    background-color: var(--popup-button-bg);
-    color: var(--popup-button-color);
-    border: 1px solid var(--popup-button-bg);
+    background-color: var(--popup-button-bg) !important;
+    color: var(--popup-button-color) !important;
+    border: 1px solid var(--popup-button-bg) !important;
     padding: 0.3rem 1rem;
 }
 

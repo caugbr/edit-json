@@ -19,7 +19,11 @@ class Strings {
             unnamed: 'Unnamed',
             viewSchema: 'View JSON schema for this field',
             hasSchema: 'This field has a JSON schema',
-            viewSchemaTitle: 'Structure and validation rules for this field'
+            viewSchemaTitle: 'Structure and validation rules for this field',
+            layoutConfig: 'Layout settings',
+            configTitle: 'Edit layout settings',
+            save: 'Save',
+            reset: 'Reset'
         },
         icon: {
             moveUpIcon: '<i class="fas fa-arrow-circle-up"></i>',
@@ -32,6 +36,7 @@ class Strings {
             popupClose: '<i class="fas fa-times"></i>',
             popupMaximize: '<i class="fas fa-window-maximize"></i>',
             popupRestore: '<i class="fas fa-window-restore"></i>',
+            configIcon: '<i class="fas fa-cog"></i>'
         },
         error: {
             targetElementNotFound: 'Target element not found.',
@@ -44,7 +49,7 @@ class Strings {
             typeNotMatch: '%path: must be of type %type',
             patternNotMatch: '%path: must match pattern %pattern',
             constDifferent: '%path: must be exactly %const',
-            invalidFormat: '%path: must be a valid %format',
+            invalidFormat: '%path: must be a valid <code>%format</code>',
             tooFewChars: '%path: must have at least %min characters',
             tooMuchChars: '%path: must have at most %max characters',
             tooLowerNumber: '%path: must be greater than or equal to %min',
