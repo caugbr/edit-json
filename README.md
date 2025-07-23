@@ -9,7 +9,7 @@ When used alongside a schema in the [JSON Schema](https://json-schema.org/) form
 - [Highlights](#highlights)
 - [How to use](#how-to-use)
 - [Customization](#customization)
-- [Customize the Editor Layout](#customize-the-editor-layout)
+- [Customizing the Editor Layout](#customizing-the-editor-layout)
 - [JSON Schema Support](#json-schema-support)
 - [License](#license)
 
