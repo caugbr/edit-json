@@ -1,4 +1,4 @@
-﻿![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-green) ![JSON Schema Validation](https://img.shields.io/badge/supports-JSON_Schema-ff69b4) ![Modern Browsers](https://img.shields.io/badge/browsers-modern_only-success)  ![License](https://img.shields.io/badge/license-MIT-blue) 
+﻿![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-green) ![JSON Schema Validation](https://img.shields.io/badge/supports-JSON_Schema-ff69b4) ![Translation Ready](https://img.shields.io/badge/translations-en%20%7C%20pt--BR-brightgreen) ![Modern Browsers](https://img.shields.io/badge/browsers-modern_only-success)  ![License](https://img.shields.io/badge/license-MIT-blue) 
 
 # EditJSON
 **EditJSON** is a JavaScript component that provides a visual editing interface in a popup, separate from the form field. Designed for use with HTML forms, this module enables clean and safe editing of JSON objects without requiring technical knowledge.
@@ -9,6 +9,7 @@ When used alongside a schema in the [JSON Schema](https://json-schema.org/) form
 - [Highlights](#highlights)
 - [How to use](#how-to-use)
 - [Customization](#customization)
+- [Customize Editor Layout](#customize-editor-layout)
 - [JSON Schema Support](#json-schema-support)
 - [License](#license)
 
@@ -41,7 +42,6 @@ This script will:
     
 
 ### Example
-
 ```html
 <textarea data-json-editor rows="6" cols="60">
 {
@@ -151,6 +151,24 @@ Strings.loadLanguage('pt-BR');
 ```
 Otherwise, if the browser's language is available in `/langs`, it will be loaded automatically.
 
+## Customizing the Editor Layout  
+The editor's layout uses CSS variables for styling, and we provide a built-in interface for users to customize **colors**, **indentation**, **fonts** and more. A basic CSS knowledge is desirable.
+
+### How to Enable  
+By default, the customization controls are hidden. To display them:  
+```javascript
+const editor = new EditJSON(element);
+editor.setConfig({ viewConfig: true }); // Shows the layout settings link
+```
+
+### Key Notes  
+- Requires `edit-json.css` to be loaded. 
+- Changes are stored locally in your browser*
+- Customizations don't affect validation or functionality.  
+- For advanced changes, override the CSS variables directly.  
+
+<sub>* Preferences won't sync across devices/browsers</sub>
+
 ## JSON Schema Support
 
 JSON Schema includes a wide range of validation rules. We chose not to use external dependencies, so our local validation doesn’t support **everything**, but we do cover the most important parts.
@@ -227,7 +245,6 @@ window.EditJSONSchemas = {
         }
     }
 };
-
 ```
 2.  **Set it on the HTML element**:
 ```html
@@ -244,8 +261,6 @@ window.EditJSONSchemas = {
 MIT © Cau Guanabara
 
 ### License Terms
-
-This project is under a modified version of the **MIT License**:
 
 -   Free to use, modify, and distribute
 -   Commercial use allowed

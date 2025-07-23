@@ -225,6 +225,7 @@ export function isColor(val) {
  * @returns {boolean} TRUE if is an email
  */
 export function isEmail(val) {
+    console.log('isEmail', val)
   // RFC 5322 compliant regex (simplified practical version)
   const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   return emailRegex.test(val.trim());
