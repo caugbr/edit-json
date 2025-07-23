@@ -59,7 +59,7 @@ class EditJSON {
         /** @type {Boolean} Let user see JSON Schema? */
         viewSchema: true,
         /** @type {Boolean} Let user personalize interface? */
-        viewConfig: true,
+        viewConfig: false,
         /** @type {Boolean} Let save JSON if is invalid against the schema? */
         blockIfInvalid: true
     };
@@ -79,7 +79,7 @@ class EditJSON {
      * @param {HTMLElement|null} jsonElement - JSON input/output element
      */
     constructor(jsonElement = null, schema = null, config = null) {
-        // Strings.init();
+        Strings.init();
 
         this.jSchema = new JsonSchema();
         

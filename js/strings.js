@@ -130,7 +130,7 @@ class Strings {
      */
     static async loadLanguage(lang) {
         try {
-            const absUrl = this.absUrl(`../i18n/${lang}.json`);
+            const absUrl = this.absUrl(`../langs/${lang}.json`);
             const response = await fetch(absUrl);
             const langData = await response.json();
             this.data = this.deepMerge(this.defaultData, langData);
@@ -140,13 +140,13 @@ class Strings {
     }
 
     /**
-     * Verify if some languege exists in i18n as a JSON file
+     * Verify if some languege exists in /langs as a JSON file
      * @static
      * @param {string} lang - Language code ('pt-BR')
      * @returns {Promise<boolean>} - True if file exists
      */
     static async languageExists(lang) {
-        const url = this.absUrl(`../i18n/${lang}.json`);
+        const url = this.absUrl(`../langs/${lang}.json`);
         try {
             const response = await fetch(url, { method: 'HEAD' });
             return response.ok;

@@ -66,8 +66,18 @@ class Popup {
         this.title = title;
         this.content = content;
 
+        this.handleKeyDown = event => {
+            if (event.key == 'Escape') {
+                this.action('esc');
+            }
+        };
+        document.addEventListener('keydown', this.handleKeyDown);
+        
         this.on('open', () => this.opened = true);
-        this.on('close', () => this.opened = false);
+        this.on('close', () => {
+            this.opened = false;
+            document.removeEventListener('keydown', this.handleKeyDown);
+        });
 
         this.on('scrollbarChange', visible => {
             const popup = $single('.popup-popup');
@@ -210,9 +220,8 @@ class Popup {
 
     action(event, ...params) {
         if (this.events[event] !== undefined) {
-            params.push(this);
             this.events[event].forEach(fnc => {
-                fnc(...params);
+                fnc.apply(this, params);
             })
         }
     }

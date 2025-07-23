@@ -213,10 +213,21 @@ export function relToAbs(relUrl) {
 /**
  * Checks if string represents a hex color
  * @param {string} val - Value to test
- * @returns {boolean} TRUE is is a color
+ * @returns {boolean} TRUE if is a color
  */
 export function isColor(val) {
     return /^(#([a-f0-9]{6}|[a-f0-9]{3})|rgb\(\s*\d{1,3},\s*\d{1,3},\s*\d{1,3}\s*\)|rgba\(\s*\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*(0|1|0\.\d+)\s*\))$/i.test(val.trim());
+}
+
+/**
+ * Checks if string represents an email address
+ * @param {string} val - Value to test
+ * @returns {boolean} TRUE if is an email
+ */
+export function isEmail(val) {
+  // RFC 5322 compliant regex (simplified practical version)
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return emailRegex.test(val.trim());
 }
 
 /**
@@ -226,13 +237,13 @@ export function isColor(val) {
  */
 export function isDateTime(val) {
     if (typeof val === 'string') {
-        if (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(val)) {
+        if (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(val.trim())) {
             return 'date';
         }
-        if (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]$/.test(val)) {
+        if (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]$/.test(val.trim())) {
             return 'datetime-local';
         }
-        if (/^([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/.test(val)) {
+        if (/^([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/.test(val.trim())) {
             return 'time';
         }
     }

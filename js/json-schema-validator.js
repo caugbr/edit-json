@@ -1,4 +1,5 @@
 import Strings from "./strings.js";
+import { isDateTime, isColor, isEmail } from "./util.js";
 
 class JsonSchemaValidator {
     schema = null;
@@ -6,11 +7,11 @@ class JsonSchemaValidator {
     constructor(schema) {
         this.schema = schema;
         this.formats = {
-            date: /^\d{4}-\d{2}-\d{2}$/,
-            time: /^\d{2}:\d{2}(:\d{2})?$/,
-            'date-time': /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/,
-            color: /^(#([a-f0-9]{6}|[a-f0-9]{3})|rgb\(\s*\d{1,3},\s*\d{1,3},\s*\d{1,3}\s*\)|rgba\(\s*\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*(0|1|0\.\d+)\s*\))$/i,
-            email: /^[^\s@]+@[^\s@]+\.[a-z0-9]{2,10}$/
+            date: (val) => { return isDateTime(val) === 'date'; },
+            time: (val) => { return isDateTime(val) === 'time'; },
+            'date-time': (val) => { return isDateTime(val) === 'datetime-local'; },
+            color: (val) => { return isColor(val); },
+            email: (val) => { return isEmail(val); }
         };
     }
 
@@ -142,7 +143,7 @@ class JsonSchemaValidator {
 
     validateFormat(value, format) {
         if (typeof value !== 'string') return false;
-        return this.formats[format] ? this.formats[format].test(value) : true;
+        return this.formats[format] ? this.formats[format](value) : true;
     }
 
     validateUniqueItems(array) {

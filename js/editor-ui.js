@@ -94,15 +94,23 @@ class EditorUI {
             this.popupTitle = this.jsonElement.dataset.title;
         }
         
+        let ret = true;
         try {
             this.jsonData = JSON.parse(this.jsonText);
             this.makeHtml();
-            return true;
+            ret = true;
         } catch (error) {
             this.reset();
             console.error(Strings.get('invalidJson', 'error', { error }));
-            return false;
+            ret = false;
         }
+        if (null !== this.jSchema.schema) {
+            const errors = this.jSchema.validateJson(this.jsonData);
+            if (errors.length) {
+                this.jsonElement.setAttribute('data-invalid', true);
+            }
+        }
+        return ret;
     }
 
     /**
@@ -203,6 +211,7 @@ class EditorUI {
         }
         const title = this.popupTitle || Strings.get('popupTitle');
         this.popup = new Popup(title, this.htmlElement);
+        this.popup.on('esc', () => this.popup.close());
         this.popup.iconClose = Strings.get('popupClose', 'icon');
         this.popup.iconMaximize = Strings.get('popupMaximize', 'icon');
         this.popup.iconRestore = Strings.get('popupRestore', 'icon');
