@@ -11,6 +11,7 @@ When used alongside a schema in the [JSON Schema](https://json-schema.org/) form
 - [Customization](#customization)
 - [Customizing the Editor Layout](#customizing-the-editor-layout)
 - [JSON Schema Support](#json-schema-support)
+- [Screenshots](#screenshots)
 - [License](#license)
 
 ## Highlights
