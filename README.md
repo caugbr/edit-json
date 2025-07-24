@@ -1,4 +1,10 @@
-﻿![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-green) ![JSON Schema Validation](https://img.shields.io/badge/supports-JSON_Schema-ff69b4) ![Translation Ready](https://img.shields.io/badge/translation-ready-brightgreen) ![Languages](https://img.shields.io/badge/langs-en_%7C_pt--BR-brightgreen) ![Modern Browsers](https://img.shields.io/badge/browsers-modern_only-success)  ![License](https://img.shields.io/badge/license-MIT-blue) 
+﻿
+![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-green) \
+![JSON Schema Validation](https://img.shields.io/badge/supports-JSON_Schema-ff69b4) \
+![Translation Ready](https://img.shields.io/badge/translation-ready-brightgreen) \
+![Languages](https://img.shields.io/badge/langs-en_%7C_pt--BR-brightgreen) \
+![Modern Browsers](https://img.shields.io/badge/browsers-modern_only-success) \
+![License](https://img.shields.io/badge/license-MIT-blue) 
 
 # EditJSON
 **EditJSON** is a JavaScript component that provides a visual editing interface in a popup, separate from the form field. Designed for use with HTML forms, this module enables clean and safe editing of JSON objects without requiring technical knowledge.
