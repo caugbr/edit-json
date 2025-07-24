@@ -40,8 +40,13 @@ This script will:
 -   Load the CSS files (`edit-json.css`, `popup.css`)
 -   Load the main class, EditJSON
 -   Apply the editor to all elements with `data-json-editor`
-    
 
+**Tag attributes you can use**
+- `data-json-editor` - Loads the editor for this field (can be empty)
+- `data-target-selector` - Specifies the element containing the JSON
+- `data-schema` - Indicates the JSON Schema to be used
+- `data-title` - Sets the popup title
+    
 ### Example
 ```html
 <textarea data-json-editor rows="6" cols="60">
@@ -127,7 +132,7 @@ editor.setConfig({
 You can use the static method `Strings.set()` to change labels or icons. To do this, import the `Strings` class as well.
 
 ```js
-import EditJSON, { Strings } from 'edit-json';
+import EditJSON, { Strings } from 'edit-json/js/edit-json.js';
 
 Strings.set({
     popupTitle: 'Edit JSON',
