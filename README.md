@@ -267,14 +267,14 @@ JSON Schema errors / field description
 Display JSON Schema
 ![Display JSON Schema](./screenshots/schema.png)
 
-Style form field compilant to schema
-![Style form field compilant to schema](./screenshots/styled-compilant.png)
-
-Style form field non compilant to schema
-![Style form field non compilant to schema](./screenshots/styled-non-compilant.png)
-
 Editor layout customization panel
 ![Editor customization panel](./screenshots/edit-layout.png)
+
+Style form field when compilant to schema
+![Style form field compilant to schema](./screenshots/styled-compilant.png)
+
+Style form field when non compilant to schema (the `tag` gets `data-invalid` attribute)
+![Style form field non compilant to schema](./screenshots/styled-non-compilant.png)
 
 ## License
 
