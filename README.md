@@ -9,9 +9,22 @@ When used alongside a schema in the [JSON Schema](https://json-schema.org/) form
 ## Table of Contents
 - [Highlights](#highlights)
 - [How to use](#how-to-use)
+    - [Automatic initialization](#automatic-initialization)
+    - [Example](#example)
+    - [Triggered by another element](#triggered-by-another-element)
+    - [Manual initialization](#manual-initialization)
 - [Customization](#customization)
+    - [Disabling controls](#disabling-controls)
+    - [Changing labels and icons](#changing-labels-and-icons)
+    - [Full interface translation](#full-interface-translation)
+    - [Styling elements with JSON Schema](#styling-elements-with-json-Schema)
 - [Customizing the Editor Layout](#customizing-the-editor-layout)
+    - [How to Enable](#how-to-enable)
+    - [Key Notes](#key-notes)
 - [JSON Schema Support](#json-schema-support)
+    - [Validated rules](#validated-rules)
+    - [Features](#features)
+    - [Example implementation](#example-implementation)
 - [Screenshots](#screenshots)
 - [License](#license)
 
@@ -193,7 +206,6 @@ textarea[data-invalid] + .schema-info {
     data-json-editor
     data-schema="metadata"
     data-title="Edit Widget Configuration"
-    placeholder="Click to edit JSON"
 ></textarea>
 <a 
     class="schema-info" 
