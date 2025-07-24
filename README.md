@@ -45,7 +45,7 @@ This script will:
 - `data-json-editor` - Loads the editor for this field (can be empty)
 - `data-target-selector` - Specifies the element containing the JSON
 - `data-schema` - Indicates the JSON Schema to be used
-- `data-title` - Sets the popup title
+- `data-title` - Sets the popup title (must be in textarea/input, even if there is a trigger element)
     
 ### Example
 ```html
@@ -157,6 +157,52 @@ To translate all strings, use `/langs/model.json` as a template and name your fi
 Strings.loadLanguage('pt-BR');
 ```
 Otherwise, if the browser's language is available in `/langs`, it will be loaded automatically.
+
+### Styling elements with JSON Schema
+
+As shown in our example page, you can use the data-invalid attribute to style elements and visually indicate whether the JSON is valid or not.
+
+```css
+.schema-info {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 13px;
+    color: #7f8c8d;
+}
+.schema-info i {
+    margin-right: 5px;
+}
+.schema-info::after {
+    content: attr(data-ok);
+}
+textarea[data-invalid] {
+    background-color: #ffe3e3;
+}
+textarea[data-invalid] + .schema-info::after {
+    content: attr(data-invalid);
+}
+textarea[data-invalid] + .schema-info {
+    color: #a52a2a;
+}
+```
+
+```html
+<textarea 
+    id="example1" 
+    class="json-data" 
+    data-json-editor
+    data-schema="metadata"
+    data-title="Edit Widget Configuration"
+    placeholder="Click to edit JSON"
+></textarea>
+<a 
+    class="schema-info" 
+    data-ok="This field follows a specific schema" 
+    data-invalid="The current structure does not match the schema!"
+>
+    <i class="fas fa-lock"></i> 
+</a>
+```
 
 ## Customizing the Editor Layout
 The editor's layout uses CSS variables for styling, and we provide a built-in interface for users to customize **colors**, **indentation**, **fonts** and more. A basic CSS knowledge is desirable.

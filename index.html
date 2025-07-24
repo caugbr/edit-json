@@ -124,25 +124,25 @@
             font-weight: 600;
             color: #2c3e50;
         }
-        .schema-link {
+        .schema-info {
             display: inline-block;
             margin-top: 5px;
             font-size: 13px;
             color: #7f8c8d;
         }
-        .schema-link::after {
+        .schema-info::after {
             content: attr(data-ok);
         }
-        textarea[data-invalid] + .schema-link::after {
+        textarea[data-invalid] + .schema-info::after {
             content: attr(data-invalid);
         }
-        .schema-link i {
+        .schema-info i {
             margin-right: 5px;
         }
         textarea[data-invalid] {
-            background-color: #ffe3e3;;
+            background-color: #ffe3e3;
         }
-        textarea[data-invalid] + .schema-link {
+        textarea[data-invalid] + .schema-info {
             color: #a52a2a;
         }
         button.json-trigger {
@@ -200,7 +200,7 @@
                 data-title="Edit Widget Configuration"
                 placeholder="Click to edit JSON"
             ></textarea>
-            <a class="schema-link" data-ok="This field follows a specific schema" data-invalid="The current structure does not match the schema!">
+            <a class="schema-info" data-ok="This field follows a specific schema" data-invalid="The current structure does not match the schema!">
                 <i class="fas fa-lock"></i> 
             </a>
         </div>
