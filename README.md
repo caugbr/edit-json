@@ -268,10 +268,10 @@ Display JSON Schema
 ![Display JSON Schema](./screenshots/schema.png)
 
 Style form field compilant to schema
-![Style form field compilant to schema](./screenshots/styled-compilant.png.png)
+![Style form field compilant to schema](./screenshots/styled-compilant.png)
 
 Style form field non compilant to schema
-![Style form field non compilant to schema](./screenshots/styled-non-compilant.png.png)
+![Style form field non compilant to schema](./screenshots/styled-non-compilant.png)
 
 Editor layout customization panel
 ![Editor customization panel](./screenshots/edit-layout.png)
