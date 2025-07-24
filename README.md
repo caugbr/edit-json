@@ -256,6 +256,26 @@ window.EditJSONSchemas = {
 ></textarea>
 ```
 
+## Screenshots
+
+Editor interface
+![Editor interface](./screenshots/editor.png)
+
+JSON Schem errors / field description
+![JSON Schem errors / field description](./screenshots/errors-description.png)
+
+Display JSON Schema
+![Display JSON Schema](./screenshots/schema.png)
+
+Style form field compilant to schema
+![Style form field compilant to schema](./screenshots/styled-compilant.png.png)
+
+Style form field non compilant to schema
+![Style form field non compilant to schema](./screenshots/styled-non-compilant.png.png)
+
+Editor layout customization panel
+![Editor customization panel](./screenshots/edit-layout.png)
+
 ## License
 
 MIT © Cau Guanabara
