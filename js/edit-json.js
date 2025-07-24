@@ -61,7 +61,9 @@ class EditJSON {
         /** @type {Boolean} Let user personalize interface? */
         viewConfig: false,
         /** @type {Boolean} Let save JSON if is invalid against the schema? */
-        blockIfInvalid: true
+        blockIfInvalid: true,
+        /** @type {Boolean} Validade fields on page load? */
+        validateOnLoad: true
     };
 
     /** @type {Object} Local configuration values */

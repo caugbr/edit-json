@@ -32,7 +32,6 @@ We designed a simple way to initialize the system when loading a form, with no c
 All elements with the `[data-json-editor]` attribute will be automatically transformed.
 
 Just import the loader (as a module), and it’ll do the rest.
-
 ```html
 <script type="module" src="js/apply-edit-json.js"></script>
 ```
@@ -118,7 +117,8 @@ editor.setConfig({
     removeItems: false,    // Prevent item removal in arrays/objects
     viewSchema: false,     // Prevent users from viewing the schema
     viewConfig: true,      // Allow user to edit the layout
-    blockIfInvalid: false  // Keep OK button enabled even with errors
+    blockIfInvalid: false, // Keep OK button enabled even with errors
+    validateOnLoad: false, // Validate fields only when close editor
 });
 ```
 
@@ -142,7 +142,7 @@ Place this code before calling `EditJSON.apply()` or directly inside the `apply-
 
 To remove Font Awesome, use `Strings.set()` to replace all icons (`lockIcon`, `moveUpIcon`, `moveDownIcon`, `removeIcon`, `collapseItemIcon`, `expandItemIcon`, `closeIcon`, `popupClose`, `popupMaximize`, `popupRestore`, `configIcon`). After that, you can safely remove the dependency.
 
-You can also use `Strings.set()` to translate the interface—but if you want to translate **everything**, there's a better way.
+You can also use `Strings.set()` to translate the interface, but if you want to translate **everything**, there's a better way.
 
 ### Full interface translation
 
@@ -153,18 +153,17 @@ Strings.loadLanguage('pt-BR');
 ```
 Otherwise, if the browser's language is available in `/langs`, it will be loaded automatically.
 
-## Customizing the Editor Layout  
+## Customizing the Editor Layout
 The editor's layout uses CSS variables for styling, and we provide a built-in interface for users to customize **colors**, **indentation**, **fonts** and more. A basic CSS knowledge is desirable.
 
-### How to Enable  
+### How to Enable
 By default, the customization controls are hidden. To display them:  
 ```javascript
 const editor = new EditJSON(element);
 editor.setConfig({ viewConfig: true }); // Shows the layout settings link
 ```
 
-### Key Notes  
-- Requires `edit-json.css` to be loaded. 
+### Key Notes
 - Changes are stored locally in your browser*
 - Customizations don't affect validation or functionality.  
 - For advanced changes, override the CSS variables directly.  
@@ -212,16 +211,16 @@ These are all validated in real-time while editing:
 **Auto-generated structure**  
 If a field has a defined schema but no initial value, the system creates the structure automatically.
 
-**Type consistency**  
+**Type consistency**
 Each data type and format is edited through a specific UI, and users can't change the type. For example, `true` won’t become `"true"`, and `1` won’t become `"1"`.
 
-**Editing restrictions**  
+**Editing restrictions**
 Certain UI controls may be hidden to enforce schema rules. For instance, an object with `additionalProperties` won’t show the “add” button, and required fields won’t have a “remove” option.
 
-**Live validation**  
-Validation is run after every change, with real-time error feedback—making it easy to understand what needs fixing.
+**Live validation**
+Validation is run after every change, with real-time error feedback, making it easy to understand what needs fixing.
 
-**Editing help**  
+**Editing help**
 The schema can optionally be shown to the user (in raw JSON format).  
 Descriptions in the schema (`description` fields) appear as tooltips or inline hints.
 
@@ -272,11 +271,11 @@ Display JSON Schema
 Editor layout customization panel
 ![Editor customization panel](./screenshots/edit-layout.png)
 
-Style form field when compilant to schema
-![Style form field compilant to schema](./screenshots/styled-compilant.png)
+Styled form field when compilant to schema
+![Styled form field compilant to schema](./screenshots/styled-compilant.png)
 
-Style form field when non compilant to schema (the `tag` gets `data-invalid` attribute)
-![Style form field non compilant to schema](./screenshots/styled-non-compilant.png)
+Styled form field when non compilant to schema (the `tag` gets `data-invalid` attribute)
+![Styled form field non compilant to schema](./screenshots/styled-non-compilant.png)
 
 ## License
 

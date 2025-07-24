@@ -104,7 +104,7 @@ class EditorUI {
             console.error(Strings.get('invalidJson', 'error', { error }));
             ret = false;
         }
-        if (null !== this.jSchema.schema) {
+        if (this.config.validateOnLoad && null !== this.jSchema.schema) {
             const errors = this.jSchema.validateJson(this.jsonData);
             if (errors.length) {
                 this.jsonElement.setAttribute('data-invalid', true);
@@ -228,7 +228,7 @@ class EditorUI {
             }
             this.jsonElement.value = JSON.stringify(json, null, 4);
             if (errors.length) {
-                this.jsonElement.setAttribute('data-invalid', '1');
+                this.jsonElement.setAttribute('data-invalid', true);
             } else {
                 this.jsonElement.removeAttribute('data-invalid');
             }
