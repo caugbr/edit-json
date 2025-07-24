@@ -261,8 +261,8 @@ window.EditJSONSchemas = {
 Editor interface
 ![Editor interface](./screenshots/editor.png)
 
-JSON Schem errors / field description
-![JSON Schem errors / field description](./screenshots/errors-description.png)
+JSON Schema errors / field description
+![JSON Schema errors / field description](./screenshots/errors-description.png)
 
 Display JSON Schema
 ![Display JSON Schema](./screenshots/schema.png)
