@@ -334,11 +334,11 @@ Display JSON Schema
 Editor layout customization panel
 ![Editor customization panel](./screenshots/edit-layout.png)
 
-Styled form field when compilant to schema
-![Styled form field compilant to schema](./screenshots/styled-compilant.png)
+Styled form field compliant with schema
+![Styled form field compliant with schema](./screenshots/styled-compilant.png)
 
-Styled form field when non compilant to schema (the `tag` gets `data-invalid` attribute)
-![Styled form field non compilant to schema](./screenshots/styled-non-compilant.png)
+Styled form field with schema errors (the element gains the `data-invalid` attribute)
+![Styled form field with schema errors](./screenshots/styled-non-compilant.png)
 
 ## License
 
