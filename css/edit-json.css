@@ -442,6 +442,27 @@ input[type="color"] {
     margin: auto 0.35rem;
 }
 
+.edit-json .edit-object-wrapper a.sort-desc,
+.edit-json .edit-object-wrapper a.sort-asc,
+.edit-json .edit-array-wrapper a.sort-desc,
+.edit-json .edit-array-wrapper a.sort-asc {
+    display: none;
+}
+
+.edit-json .edit-object-wrapper.sorted-asc a.sort-asc,
+.edit-json .edit-array-wrapper.sorted-asc a.sort-asc,
+.edit-json .edit-object-wrapper.sorted-desc a.sort-desc,
+.edit-json .edit-array-wrapper.sorted-desc a.sort-desc {
+    display: inline;
+}
+
+.edit-json .edit-object-wrapper.sorted-asc a.sort,
+.edit-json .edit-object-wrapper.sorted-desc a.sort,
+.edit-json .edit-array-wrapper.sorted-asc a.sort,
+.edit-json .edit-array-wrapper.sorted-desc a.sort {
+    display: none;
+}
+
 /* Toggle visibility */
 .edit-json .edit-object-wrapper a.toggle.down,
 .edit-json .edit-array-wrapper a.toggle.down {
@@ -514,12 +535,21 @@ input[type="color"] {
 }
 
 .edit-json .actions a,
-.edit-json a.toggle {
+.edit-json a.toggle,
+.edit-json a.sort,
+.edit-json a.sort-desc,
+.edit-json a.sort-asc {
     font-size: var(--icon-font-size);
     margin-left: 0.3rem;
     vertical-align: middle;
     line-height: 1;
     color: var(--action-color);
+}
+
+.edit-json a.sort,
+.edit-json a.sort-desc,
+.edit-json a.sort-asc {
+    margin: 0 0.3rem 0 0 !important;
 }
 
 .edit-json a.remove-item {
@@ -561,6 +591,12 @@ input[type="color"] {
 /* Hide move actions globally */
 .edit-json.no-move a.up-item,
 .edit-json.no-move a.down-item {
+    display: none;
+}
+
+.edit-json.no-sort a.sort,
+.edit-json.no-sort a.sort-desc,
+.edit-json.no-sort a.sort-asc {
     display: none;
 }
 

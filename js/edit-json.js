@@ -63,7 +63,9 @@ class EditJSON {
         /** @type {Boolean} Let save JSON if is invalid against the schema? */
         blockIfInvalid: true,
         /** @type {Boolean} Validade fields on page load? */
-        validateOnLoad: true
+        validateOnLoad: true,
+        /** @type {Boolean} Let users sort arrays and objects? */
+        sortLists: true
     };
 
     /** @type {Object} Local configuration values */

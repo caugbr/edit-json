@@ -138,6 +138,7 @@ editor.setConfig({
     viewConfig: true,      // Allow user to edit the layout
     blockIfInvalid: false, // Keep OK button enabled even with errors
     validateOnLoad: false, // Validate fields only when close editor
+    sortLists: false,      // Hide sort links
 });
 ```
 

@@ -162,6 +162,7 @@ class EditorUI {
             elem = this.editObject(this.jsonData);
         }
 
+        this.htmlElement.innerHTML = '';
         this.htmlElement.appendChild(tag('div', { class: 'errors' }));
         this.htmlElement.appendChild(elem);
         await this.showConfigLink();
@@ -206,9 +207,7 @@ class EditorUI {
      * Opens the editor in a popup
      */
     openEditor() {
-        if (this.htmlElement.innerHTML.trim() === '') {
-            this.edit();
-        }
+        this.edit();
         const title = this.popupTitle || Strings.get('popupTitle');
         this.popup = new Popup(title, this.htmlElement);
         this.popup.on('esc', () => this.popup.close());
@@ -216,8 +215,16 @@ class EditorUI {
         this.popup.iconMaximize = Strings.get('popupMaximize', 'icon');
         this.popup.iconRestore = Strings.get('popupRestore', 'icon');
         this.htmlElement.style.display = 'block';
-        const cancelButton = tag('button', { type: 'button', class: 'close-popup secondary' }, Strings.get('popupCancelButtonLabel'));
-        const okButton = tag('button', { type: 'button', class: 'save-json' }, Strings.get('popupOkButtonLabel'));
+        const cancelButton = tag(
+            'button', 
+            { type: 'button', class: 'close-popup secondary' }, 
+            Strings.get('popupCancelButtonLabel')
+        );
+        const okButton = tag(
+            'button', 
+            { type: 'button', class: 'save-json' }, 
+            Strings.get('popupOkButtonLabel')
+        );
         cancelButton.addEventListener('click', () => this.popup.close());
         okButton.addEventListener('click', async () => {
             const json = this.extractFromHtml();
@@ -238,7 +245,10 @@ class EditorUI {
         this.popup.addFooterButton(okButton);
         this.popup.on('open', () => {
             if (null !== this.jSchema.schema) {
-                setTimeout(() => this.verifyErrors(), 500);
+                setTimeout(() => {
+                    this.setSortIndexes();
+                    this.verifyErrors();
+                }, 500);
             }
         });
         this.popup.open();
@@ -366,7 +376,9 @@ class EditorUI {
      */
     valHtml(val, actions = true, path = '') {
         let valText;
-        switch (this.ej.getType(val)) {
+        const type = this.ej.getType(val);
+        let typeClass = type;
+        switch (type) {
             case 'boolean':
                 const yes = { value: 'true' };
                 if (true === val) yes.selected = true;
@@ -391,7 +403,7 @@ class EditorUI {
                 valText = tag('input', { 
                     type: 'number', 
                     value: val, 
-                    class: 'edit-value-number-input'
+                    class: 'edit-value edit-value-number-input'
                 });
                 break;
             default:
@@ -404,16 +416,25 @@ class EditorUI {
                 }
                 const dateType = this.ej.isDateTime(val);
                 if (schemaFormat) {
+                    typeClass = schemaFormat;
                     valText = this.bidirectTextInput(schemaFormat, val);
                 } else if (dateType) {
+                    typeClass = dateType;
                     valText = this.bidirectTextInput(dateType, val);
                 } else if (this.ej.isColor(val)) {
+                    typeClass = 'color';
                     valText = this.bidirectTextInput('color', val);
                 } else {
-                    valText = this.enumField(val) || tag('span', { contenteditable: true, class: 'edit-value' }, val);
+                    const enumHtml = this.enumField(val);
+                    valText = enumHtml || tag('span', { contenteditable: true, class: 'edit-value' }, val);
+                    if (enumHtml) {
+                        typeClass = enumHtml;
+                    } else {
+                        typeClass = 'string';
+                    }
                 }
         }
-        const attrs = { class: 'input-wrapper' };
+        const attrs = { class: `input-wrapper type-${typeClass}` };
         if (path) {
             attrs['data-path'] = path;
         }
@@ -465,7 +486,7 @@ class EditorUI {
             value = (new Date()).toTimeString().substring(0, 5);
         }
         const txt = tag('span', { contenteditable: true, class: 'edit-value' }, value);
-        const inp = tag('input', { type, value, class: `edit-value-${type}-input`, novalidate: '' });
+        const inp = tag('input', { type, value, class: `edit-value edit-value-${type}-input`, novalidate: '' });
         const line = tag('span', { class: `edit-value-${type}` }, [ txt, inp ]);
         txt.addEventListener('focus', () => line.classList.add('focused'));
         txt.addEventListener('blur', () => line.classList.remove('focused'));
@@ -630,8 +651,8 @@ class EditorUI {
     }
 
     /**
-     * Creates toggle links (collapse/expand)
-     * @returns {HTMLElement[]} Array of toggle elements
+     * Creates toggle and sort links (collapse/expand/sort/sort acs/sort desc)
+     * @returns {HTMLElement[]} Array of elements
      */
     toggleLinks() {
         const toggleUp = tag('a', { 
@@ -640,21 +661,124 @@ class EditorUI {
             title: Strings.get('collapseItemTitle'), 
             href: '#' 
         }, Strings.get('collapseItemIcon', 'icon'));
+        toggleUp.addEventListener('click', event => {
+            event.preventDefault();
+            this.toggleUp(event.target);
+        });
         const toggleDown = tag('a', { 
             class: 'toggle down', 
             'data-skip': true,
             title: Strings.get('expandItemTitle'), 
             href: '#' 
         }, Strings.get('expandItemIcon', 'icon'));
-        toggleUp.addEventListener('click', event => {
-            event.preventDefault();
-            this.toggleUp(event.target);
-        });
         toggleDown.addEventListener('click', event => {
             event.preventDefault();
             this.toggleDown(event.target);
         });
-        return [toggleUp, toggleDown];
+        const retArr =  [toggleUp, toggleDown];
+        if (this.config.sortLists) {
+            const sortFn = event => {
+                event.preventDefault();
+                const button = event.target.closest('a.sort,a.sort-desc,a.sort-asc');
+                const direction = button.matches('.sort') ? 'asc' : button.matches('.sort-asc') ? 'desc' : 'original';
+                const wrapper = event.target.closest('.edit-object-wrapper,.edit-array-wrapper');
+                const editEl = wrapper.querySelector('.edit-object,.edit-array');
+                const objType = wrapper.className.includes('edit-array-wrapper') ? 'array' : 'object';
+                this.sort(objType, direction, editEl);
+            };
+            const sort = tag('a', { 
+                class: 'sort', 
+                'data-skip': true,
+                title: Strings.get('sort'), 
+                href: '#' 
+            }, Strings.get('sortIcon', 'icon'));
+            const sortUp = tag('a', { 
+                class: 'sort-desc', 
+                'data-skip': true,
+                title: Strings.get('sortUp'), 
+                href: '#' 
+            }, Strings.get('sortUpIcon', 'icon'));
+            const sortDown = tag('a', { 
+                class: 'sort-asc', 
+                'data-skip': true,
+                title: Strings.get('sortDown'), 
+                href: '#' 
+            }, Strings.get('sortDownIcon', 'icon'));
+            sort.addEventListener('click', sortFn);
+            sortUp.addEventListener('click', sortFn);
+            sortDown.addEventListener('click', sortFn);
+            retArr.push(sort, sortUp, sortDown);
+        }
+        return retArr;
+    }
+
+    setSortIndexes() {
+        const processLines = (lines) => {
+            lines.forEach((line, index) => {
+                if (!line.dataset.index) {
+                    line.dataset.index = index;
+                }
+            });
+        };
+
+        const allObjects = Array.from(document.querySelectorAll('.edit-json .edit-object'));
+        allObjects.forEach(obj => {
+            const lines = Array.from(obj.querySelectorAll(':scope > .edit-line'));
+            processLines(lines);
+        });
+
+        const allArrays = Array.from(document.querySelectorAll('.edit-json .edit-array'));
+        allArrays.forEach(arr => {
+            const lines = Array.from(arr.querySelectorAll(':scope > .input-wrapper'));
+            processLines(lines);
+        });
+    }
+
+    sort(type, direction, elem) {
+        let linesToSort;
+        if (type === 'array') {
+            linesToSort = Array.from(elem.querySelectorAll(':scope > .input-wrapper'));
+        } else if (type === 'object') {
+            linesToSort = Array.from(elem.querySelectorAll(':scope > .edit-line'));
+        } else {
+            console.warn(`Tipo de ordenação inválido: ${type}. Use 'array' ou 'object'.`);
+            return;
+        }
+        this.sortDirection = direction;
+        linesToSort.sort(this.sortItems);
+        linesToSort.forEach(line => elem.appendChild(line));
+        const addLine = elem.querySelector('.add-obj-item');
+        if (addLine) {
+            elem.appendChild(addLine);
+        }
+
+        const wrapper = elem.closest('.edit-object-wrapper,.edit-array-wrapper');
+        wrapper.classList.remove('sorted-original', 'sorted-desc', 'sorted-asc');
+        wrapper.classList.add(`sorted-${direction}`);
+    }
+
+    sortItems = (aElem, bElem) => {
+        const extractVal = elem => {
+            const ev = elem.querySelector('.edit-key,.edit-value');
+            return ev ? (ev.value?.trim() ?? ev.innerText?.trim() ?? '') : '';
+        };
+        const aText = extractVal(aElem);
+        const bText = extractVal(bElem);
+        const aNum = parseFloat(aText);
+        const bNum = parseFloat(bText);
+        const isANum = !isNaN(aNum);
+        const isBNum = !isNaN(bNum);
+        if (this.sortDirection === 'original') {
+            const indexA = parseInt(aElem.dataset.index);
+            const indexB = parseInt(bElem.dataset.index);
+            return indexA - indexB;
+        }
+        if (isANum && isBNum) {
+            return this.sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+        }
+        if (isANum) return -1;
+        if (isBNum) return 1;
+        return this.sortDirection === 'asc' ? aText.localeCompare(bText) : bText.localeCompare(aText);
     }
 
     /**
@@ -765,6 +889,7 @@ class EditorUI {
         div.parentElement.insertBefore(item, div);
         select.value = '';
         this.enableAddButton(select);
+        this.setSortIndexes();
         this.verifyErrors();
     }
 
